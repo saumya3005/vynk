@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+/* stylelint-disable at-rule-no-unknown */
+@theme {
+  --color-vynk-peach: #FFB997;
+  --color-vynk-coral: #FF8E72;
+  --color-vynk-lavender: #CDB4FF;
+  --color-vynk-lilac: #E4C1F9;
+  --color-vynk-mint: #B8F2E6;
+  --color-vynk-ivory: #FFFDF8;
+  --color-vynk-cream: #FFF7F0;
+  --color-vynk-charcoal: #1A1A1A;
+
+  --font-sans: "Outfit", "Inter", sans-serif;
+}
+
+/* === Base Styles === */
+body {
+  background-color: var(--color-vynk-ivory);
+  color: var(--color-vynk-charcoal);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-image:
+    radial-gradient(at 0% 0%, rgba(205, 180, 255, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(255, 185, 151, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(184, 242, 230, 0.15) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(255, 142, 114, 0.15) 0px, transparent 50%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+/* === Component Styles === */
+.glass-card {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+  border-radius: 1rem;
+}
+
+.glass-input {
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.glass-input:focus {
+  box-shadow: 0 0 0 2px var(--color-vynk-lavender);
+}
+
+.btn-primary {
+  background: linear-gradient(to right, var(--color-vynk-coral), var(--color-vynk-peach));
+  color: #fff;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 14px 0 rgba(255, 142, 114, 0.3);
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 6px 20px 0 rgba(255, 142, 114, 0.45);
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--color-vynk-charcoal);
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
