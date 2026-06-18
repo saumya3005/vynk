@@ -35,7 +35,7 @@ const Navbar = () => {
         )}
         
         <Link to="/dashboard" className="text-vynk-charcoal/70 hover:text-vynk-lilac transition-colors" title="Dashboard"><LayoutDashboard size={22} /></Link>
-        <Link to={`/profile/${user?.id}`} className="text-vynk-charcoal/70 hover:text-vynk-mint transition-colors" title="Profile"><User size={22} /></Link>
+        <Link to="/profile" className="text-vynk-charcoal/70 hover:text-vynk-mint transition-colors" title="Profile"><User size={22} /></Link>
         
         <button onClick={handleLogout} className="text-vynk-charcoal/70 hover:text-red-500 transition-colors ml-4" title="Logout">
           <LogOut size={22} />

@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Save } from 'lucide-react';
+import { projectApi } from '../api/projectApi';
+import toast from 'react-hot-toast';
 
 const CreateProject = () => {
   const navigate = useNavigate();
@@ -10,12 +12,46 @@ const CreateProject = () => {
     techStack: '', githubLink: '', demoLink: '', category: 'Web App',
     collabOpen: false
   });
+  const [selectedFiles, setSelectedFiles] = useState([]);
 
-  const handleSubmit = (e) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: API Integration
-    console.log('Project created:', formData);
-    navigate('/projects');
+    setIsLoading(true);
+
+    try {
+      // Convert all selected files to base64
+      const fileArray = selectedFiles ? Array.from(selectedFiles) : [];
+      const base64Images = await Promise.all(
+        fileArray.map(file => new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.readAsDataURL(file);
+        }))
+      );
+
+      const payload = {
+        title: formData.title,
+        description: formData.description,
+        problemStatement: formData.problemStatement,
+        solution: formData.solution,
+        techStack: formData.techStack.split(',').map(s => s.trim()).filter(Boolean),
+        githubLink: formData.githubLink,
+        demoLink: formData.demoLink,
+        category: formData.category,
+        collaborationOpen: formData.collabOpen,
+        images: base64Images
+      };
+
+      await projectApi.createProject(payload);
+      toast.success('Project created successfully!');
+      navigate('/projects');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to create project');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -56,14 +92,20 @@ const CreateProject = () => {
               onChange={e => setFormData({...formData, techStack: e.target.value})} />
           </div>
 
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-vynk-charcoal/80">Project Screenshots (Max 5)</label>
+            <input type="file" multiple accept="image/*" className="glass-input p-2" 
+              onChange={e => setSelectedFiles(e.target.files)} />
+          </div>
+
           <label className="flex items-center gap-3 p-4 bg-white/40 border border-white rounded-xl cursor-pointer hover:bg-white/60 transition-colors">
             <input type="checkbox" className="w-5 h-5 text-vynk-coral rounded focus:ring-vynk-coral border-gray-300" 
               onChange={e => setFormData({...formData, collabOpen: e.target.checked})} />
             <span className="font-medium text-vynk-charcoal">I am looking for collaborators for this project</span>
           </label>
 
-          <button type="submit" className="btn-primary mt-4 flex justify-center items-center gap-2">
-            <Save size={20} /> Publish Project
+          <button type="submit" disabled={isLoading} className="btn-primary mt-4 flex justify-center items-center gap-2">
+            <Save size={20} /> {isLoading ? 'Publishing...' : 'Publish Project'}
           </button>
         </form>
       </motion.div>

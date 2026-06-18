@@ -1,5 +1,11 @@
 const mongoose = require('mongoose');
 
+const commentSchema = new mongoose.Schema({
+  author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  text: { type: String, required: true },
+  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+}, { timestamps: true });
+
 const projectSchema = new mongoose.Schema({
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   title: { type: String, required: true },
@@ -10,11 +16,15 @@ const projectSchema = new mongoose.Schema({
   githubLink: { type: String },
   demoLink: { type: String },
   images: [{ type: String }],
+  publicIds: [{ type: String }],
   teamMembers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }],
+  saves: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  comments: [commentSchema],
   collaborationOpen: { type: Boolean, default: false },
-  category: { type: String }
+  collaborationRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  category: { type: String },
+  views: { type: Number, default: 0 }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Project', projectSchema);

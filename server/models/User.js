@@ -10,7 +10,9 @@ const userSchema = new mongoose.Schema({
     default: 'Student'
   },
   avatar: { type: String, default: '' },
+  avatarPublicId: { type: String, default: '' },
   coverImage: { type: String, default: '' },
+  coverPublicId: { type: String, default: '' },
   bio: { type: String, default: '' },
   skills: [{ type: String }],
   education: [{
@@ -35,7 +37,9 @@ const userSchema = new mongoose.Schema({
   following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   savedPosts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }],
   savedProjects: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Project' }],
-  savedNotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Note' }]
+  savedNotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Note' }],
+  isOnline: { type: Boolean, default: false },
+  lastSeen: { type: Date, default: Date.now }
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

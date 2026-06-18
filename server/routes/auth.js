@@ -8,13 +8,21 @@ const auth = require('../middleware/auth');
 // Register
 router.post('/register', async (req, res) => {
   try {
+    console.log('[Register] Body received:', req.body);
     const { username, email, password, role } = req.body;
     
-    let user = await User.findOne({ email });
-    if (user) return res.status(400).json({ message: 'User already exists' });
+    if (!username || !email || !password) {
+      return res.status(400).json({ message: 'Username, email, and password are required' });
+    }
+    if (password.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters' });
+    }
     
-    user = await User.findOne({ username });
-    if (user) return res.status(400).json({ message: 'Username is taken' });
+    let existing = await User.findOne({ email });
+    if (existing) return res.status(400).json({ message: 'An account with this email already exists' });
+    
+    existing = await User.findOne({ username });
+    if (existing) return res.status(400).json({ message: 'Username is already taken' });
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -37,7 +45,7 @@ router.post('/register', async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
-    res.status(201).json({ token, user: { id: user.id, username: user.username, email: user.email, role: user.role } });
+    res.status(201).json({ token, user: { _id: user.id, id: user.id, username: user.username, email: user.email, role: user.role } });
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');
@@ -47,6 +55,7 @@ router.post('/register', async (req, res) => {
 // Login
 router.post('/login', async (req, res) => {
   try {
+    console.log('[Login] Body received:', req.body);
     const { email, password } = req.body;
     
     const user = await User.findOne({ email });
@@ -64,7 +73,7 @@ router.post('/login', async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
-    res.json({ token, user: { id: user.id, username: user.username, email: user.email, role: user.role } });
+    res.json({ token, user: { _id: user.id, id: user.id, username: user.username, email: user.email, role: user.role, avatar: user.avatar } });
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');

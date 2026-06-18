@@ -28,7 +28,8 @@ app.use(cors({
   origin: true,
   credentials: true
 }));
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cookieParser());
 
 // Routes
@@ -41,6 +42,12 @@ app.use('/api/communities', communityRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/notifications', notificationRoutes);
 
+const storyRoutes = require('./routes/stories');
+const reelRoutes = require('./routes/reels');
+
+app.use('/api/stories', storyRoutes);
+app.use('/api/reels', reelRoutes);
+
 app.get('/api/health', (req, res) => {
   res.json({ success: true, message: "Vynk API is running" });
 });
@@ -48,6 +55,14 @@ app.get('/api/health', (req, res) => {
 // Socket.io integration
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
+
+  socket.on('join', (userId) => {
+    if (userId) socket.join(userId);
+  });
+
+  socket.on('sendMessage', (data) => {
+    io.to(data.receiverId).emit('receiveMessage', data);
+  });
 
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);

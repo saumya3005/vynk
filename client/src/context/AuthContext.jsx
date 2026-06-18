@@ -9,34 +9,43 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadUser = async () => {
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-      try {
-        const res = await api.get('/auth/me');
-        setUser(res.data);
-      } catch (error) {
-        console.error('Failed to load user', error);
-        setToken(null);
-        localStorage.removeItem('token');
-      } finally {
-        setLoading(false);
-      }
-    };
     loadUser();
   }, [token]);
 
+  const loadUser = async () => {
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+    try {
+      const res = await api.get('/auth/me');
+      // Ensure user always has _id for easy access
+      const userData = { ...res.data, id: res.data._id || res.data.id };
+      setUser(userData);
+    } catch (error) {
+      console.error('Failed to load user', error);
+      setToken(null);
+      localStorage.removeItem('token');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const refreshUser = async () => {
+    await loadUser();
+  };
+
   const login = (newToken, userData) => {
     setToken(newToken);
-    setUser(userData);
+    const normalizedUser = { ...userData, id: userData._id || userData.id };
+    setUser(normalizedUser);
     localStorage.setItem('token', newToken);
   };
 
   const register = (newToken, userData) => {
     setToken(newToken);
-    setUser(userData);
+    const normalizedUser = { ...userData, id: userData._id || userData.id };
+    setUser(normalizedUser);
     localStorage.setItem('token', newToken);
   };
 
@@ -52,7 +61,16 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, isAuthenticated: !!user, login, register, logout }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      token, 
+      loading, 
+      isAuthenticated: !!user, 
+      login, 
+      register, 
+      logout,
+      refreshUser 
+    }}>
       {!loading && children}
     </AuthContext.Provider>
   );

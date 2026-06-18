@@ -1,5 +1,6 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
+import { Toaster } from 'react-hot-toast';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -27,6 +28,7 @@ function App() {
 
   return (
     <div className="w-full min-h-screen flex flex-col">
+      <Toaster position="bottom-center" />
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           {/* Public Routes */}
@@ -37,6 +39,7 @@ function App() {
           {/* Protected App Routes inside AppShell */}
           <Route element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
             <Route path="/feed" element={<Feed />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/profile/:id" element={<Profile />} />
             <Route path="/explore" element={<Explore />} />
             
@@ -46,6 +49,8 @@ function App() {
             
             <Route path="/notes" element={<Notes />} />
             <Route path="/notes/upload" element={<UploadNotes />} />
+            <Route path="/upload-notes" element={<UploadNotes />} />
+            <Route path="/notes/:id" element={<Notes />} />
             
             <Route path="/communities" element={<Communities />} />
             <Route path="/communities/:id" element={<CommunityDetails />} />

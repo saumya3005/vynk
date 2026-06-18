@@ -1,16 +1,43 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { UploadCloud } from 'lucide-react';
+
+import MediaUploader from '../components/ui/MediaUploader';
+import { noteApi } from '../api/noteApi';
+import toast from 'react-hot-toast';
 
 const UploadNotes = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ title: '', subject: '', semester: '', branch: '', college: '', tags: '' });
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Notes uploaded:', formData);
-    navigate('/notes');
+    if (!selectedFile) return toast.error('Please select a file');
+    
+    setIsSubmitting(true);
+    
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      try {
+        const payload = {
+          ...formData,
+          fileUrl: reader.result,
+          fileName: selectedFile.name,
+          fileType: selectedFile.type || 'application/octet-stream'
+        };
+
+        await noteApi.uploadNote(payload);
+        toast.success('Note uploaded successfully!');
+        navigate('/notes');
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Failed to upload note');
+      } finally {
+        setIsSubmitting(false);
+      }
+    };
+    reader.readAsDataURL(selectedFile);
   };
 
   return (
@@ -19,10 +46,8 @@ const UploadNotes = () => {
         <h1 className="text-3xl font-bold text-vynk-charcoal mb-8">Upload Notes</h1>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          <div className="border-2 border-dashed border-vynk-charcoal/20 rounded-xl p-8 text-center bg-white/30 hover:bg-white/50 transition-colors cursor-pointer mb-4">
-            <UploadCloud size={40} className="mx-auto text-vynk-charcoal/40 mb-3" />
-            <p className="font-medium text-vynk-charcoal">Click to browse or drag PDF here</p>
-            <p className="text-xs text-vynk-charcoal/50 mt-1">Max file size: 10MB</p>
+          <div className="mb-4">
+             <MediaUploader onFileSelect={setSelectedFile} accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,image/*" label="Upload Document" />
           </div>
 
           <input type="text" placeholder="Title" className="glass-input" required onChange={e => setFormData({...formData, title: e.target.value})} />
@@ -32,7 +57,9 @@ const UploadNotes = () => {
             <input type="text" placeholder="Semester (e.g. Sem 5)" className="glass-input" required onChange={e => setFormData({...formData, semester: e.target.value})} />
           </div>
 
-          <button type="submit" className="btn-primary mt-4 flex justify-center">Upload Document</button>
+          <button type="submit" disabled={isSubmitting} className="btn-primary mt-4 flex justify-center">
+             {isSubmitting ? 'Uploading...' : 'Upload Document'}
+          </button>
         </form>
       </motion.div>
     </div>

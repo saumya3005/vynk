@@ -1,8 +1,9 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Compass, Briefcase, BookOpen, Users, MessageSquare, Bell, LayoutDashboard, User, PlayCircle, PlusCircle } from 'lucide-react';
+import { Home, Compass, Briefcase, BookOpen, Users, MessageSquare, Bell, LayoutDashboard, User, PlayCircle } from 'lucide-react';
 import { useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { motion } from 'framer-motion';
+import GlobalCreateDropdown from '../ui/GlobalCreateDropdown';
 
 const NAV_ITEMS = [
   { icon: Home, label: 'Feed', path: '/feed' },
@@ -63,11 +64,9 @@ const Sidebar = () => {
         )}
       </div>
 
-      <button className="btn-primary w-full mt-4 mb-6 shadow-lg shadow-vynk-primary/20">
-        <PlusCircle size={20} /> Create
-      </button>
+      <GlobalCreateDropdown />
 
-      <Link to={`/profile/${user?.id}`} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/60 transition-colors mt-auto group">
+      <Link to="/profile" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/60 transition-colors mt-auto group">
         <div className="w-10 h-10 rounded-full bg-linear-to-tr from-vynk-secondary to-vynk-accent border-2 border-transparent group-hover:border-vynk-primary transition-all overflow-hidden shrink-0">
            {user?.avatar && <img src={user.avatar} alt="avatar" className="w-full h-full object-cover" />}
         </div>

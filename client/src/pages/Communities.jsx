@@ -1,81 +1,65 @@
-import { useState, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { motion } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext';
-import { Search, Hash, Users, MessageCircle, Calendar, Plus } from 'lucide-react';
-import { Link } from 'react-router-dom';
-
-const MOCK_COMMUNITIES = [
-  {
-    id: 1,
-    name: 'Frontend Wizards',
-    description: 'A community for modern React, Vue, and Tailwind developers. We discuss UI/UX, animations, and performance.',
-    members: '12.5k',
-    category: 'Development',
-    color: 'from-pink-500 to-rose-500',
-    isJoined: true
-  },
-  {
-    id: 2,
-    name: 'AI & Machine Learning',
-    description: 'Deep learning, neural networks, PyTorch, and TensorFlow discussions. Research paper breakdowns every Sunday.',
-    members: '8.2k',
-    category: 'Data Science',
-    color: 'from-violet-500 to-purple-500',
-    isJoined: false
-  },
-  {
-    id: 3,
-    name: 'Startup Founders',
-    description: 'Build, launch, and scale. Connect with co-founders, investors, and early adopters in the Vynk ecosystem.',
-    members: '4.1k',
-    category: 'Business',
-    color: 'from-vynk-primary to-orange-500',
-    isJoined: true
-  },
-  {
-    id: 4,
-    name: 'Open Source Contributors',
-    description: 'Find issues, make pull requests, and build your GitHub portfolio together with supportive mentors.',
-    members: '15k',
-    category: 'Collaboration',
-    color: 'from-emerald-500 to-teal-500',
-    isJoined: false
-  }
-];
+import { Hash, Users, Plus } from 'lucide-react';
+import { communityApi } from '../api/communityApi';
+import toast from 'react-hot-toast';
+import CreateCommunityModal from '../components/ui/CreateCommunityModal';
 
 const CommunityCard = ({ comm }) => {
-  const [joined, setJoined] = useState(comm.isJoined);
+  const { user } = useContext(AuthContext);
+  const [isJoined, setIsJoined] = useState(comm.members?.includes(user?.id) || false);
+  const [memberCount, setMemberCount] = useState(comm.members?.length || 0);
+
+  const handleJoin = async () => {
+    try {
+      if (isJoined) {
+        const updatedMembers = await communityApi.leaveCommunity(comm._id);
+        setIsJoined(false);
+        setMemberCount(updatedMembers.length);
+        toast.success(`Left ${comm.name}`);
+      } else {
+        const updatedMembers = await communityApi.joinCommunity(comm._id);
+        setIsJoined(true);
+        setMemberCount(updatedMembers.length);
+        toast.success(`Joined ${comm.name}`);
+      }
+    } catch (err) {
+      toast.error('Failed to update community status');
+    }
+  };
 
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="glass-card overflow-hidden flex flex-col"
+      className="glass-card overflow-hidden flex flex-col h-full"
     >
-      <div className={`h-24 w-full bg-linear-to-tr ${comm.color} relative`}>
+      <div className={`h-24 w-full bg-linear-to-tr from-vynk-primary to-vynk-secondary relative`}>
+        {comm.banner && <img src={comm.banner} className="w-full h-full object-cover opacity-60 mix-blend-overlay" />}
         <div className="absolute -bottom-6 left-6 w-12 h-12 rounded-xl bg-white shadow-lg flex items-center justify-center text-vynk-text">
           <Hash size={24} />
         </div>
       </div>
       
       <div className="p-6 pt-10 flex-1 flex flex-col">
-        <h3 className="text-xl font-bold text-vynk-text mb-2">{comm.name}</h3>
-        <p className="text-sm font-bold text-vynk-primary mb-3">{comm.category}</p>
-        <p className="text-sm text-vynk-muted mb-6 flex-1">{comm.description}</p>
+        <h3 className="text-xl font-bold text-vynk-text mb-2 line-clamp-1">{comm.name}</h3>
+        <p className="text-sm font-bold text-vynk-primary mb-3">{comm.category || 'General'}</p>
+        <p className="text-sm text-vynk-muted mb-6 flex-1 line-clamp-3">{comm.description}</p>
         
         <div className="flex items-center justify-between pt-4 border-t border-vynk-border">
           <div className="flex items-center gap-2 text-xs font-bold text-vynk-text/70">
-            <Users size={16} /> {comm.members} Members
+            <Users size={16} /> {memberCount} Members
           </div>
           <button 
-            onClick={() => setJoined(!joined)}
+            onClick={handleJoin}
             className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
-              joined 
+              isJoined 
                 ? 'bg-vynk-bg-2 border border-vynk-border text-vynk-muted hover:text-red-500 hover:border-red-500' 
                 : 'bg-vynk-text text-white hover:bg-vynk-primary'
             }`}
           >
-            {joined ? 'Joined' : 'Join'}
+            {isJoined ? 'Joined' : 'Join'}
           </button>
         </div>
       </div>
@@ -84,6 +68,26 @@ const CommunityCard = ({ comm }) => {
 };
 
 const Communities = () => {
+  const [communities, setCommunities] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+
+  useEffect(() => {
+    fetchCommunities();
+  }, []);
+
+  const fetchCommunities = async () => {
+    setIsLoading(true);
+    try {
+      const data = await communityApi.getCommunities();
+      setCommunities(data);
+    } catch (err) {
+      toast.error('Failed to load communities');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="p-4 md:p-8 max-w-7xl mx-auto pb-24 md:pb-8">
       {/* Header */}
@@ -92,20 +96,35 @@ const Communities = () => {
           <h1 className="text-4xl font-extrabold text-vynk-text mb-2">Communities</h1>
           <p className="text-vynk-muted font-medium max-w-xl">Join micro-ecosystems, find your tribe, participate in discussions, and attend virtual events.</p>
         </div>
-        <button className="btn-primary shrink-0">
+        <button onClick={() => setShowCreateModal(true)} className="btn-primary shrink-0">
           <Plus size={20} /> Create Community
         </button>
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {MOCK_COMMUNITIES.map(comm => (
-          <CommunityCard key={comm.id} comm={comm} />
-        ))}
-        {MOCK_COMMUNITIES.map(comm => (
-          <CommunityCard key={`dup-${comm.id}`} comm={{...comm, id: comm.id + 10, isJoined: false}} />
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="w-10 h-10 border-4 border-vynk-primary border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      ) : communities.length === 0 ? (
+        <div className="text-center py-20 text-vynk-muted">
+          <p className="text-xl font-bold">No communities yet</p>
+          <p className="text-sm">Be the first to create one!</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {communities.map(comm => (
+            <CommunityCard key={comm._id} comm={comm} />
+          ))}
+        </div>
+      )}
+
+      {showCreateModal && (
+        <CreateCommunityModal 
+          onClose={() => setShowCreateModal(false)}
+          onCreated={(newComm) => setCommunities([newComm, ...communities])}
+        />
+      )}
     </div>
   );
 };

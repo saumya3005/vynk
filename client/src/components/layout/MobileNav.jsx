@@ -12,7 +12,7 @@ const MobileNav = () => {
     { icon: Compass, path: '/explore' },
     { icon: PlusSquare, path: '/create', special: true },
     { icon: MessageSquare, path: '/chat' },
-    { icon: User, path: `/profile/${user?.id}` },
+    { icon: User, path: '/profile' },
   ];
 
   return (
