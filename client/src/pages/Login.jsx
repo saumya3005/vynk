@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { LogIn } from 'lucide-react';
-import axios from 'axios';
+import api from '../api/axios';
+import { AuthContext } from '../context/AuthContext';
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -19,12 +21,10 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', formData, {
-        withCredentials: true
-      });
+      const res = await api.post('/auth/login', formData);
       console.log('Logged in:', res.data);
-      // Navigate to home feed (to be built)
-      navigate('/');
+      login(res.data.token, res.data.user);
+      navigate('/feed');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
     }
@@ -32,7 +32,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -53,30 +53,30 @@ const Login = () => {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium text-vynk-charcoal/80">Email</label>
-            <input 
-              type="email" 
+            <input
+              type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="Enter your email" 
+              placeholder="Enter your email"
               className="glass-input"
-              required 
+              required
             />
           </div>
-          
+
           <div className="flex flex-col gap-1">
             <div className="flex justify-between items-center">
               <label className="text-sm font-medium text-vynk-charcoal/80">Password</label>
               <a href="#" className="text-xs text-vynk-coral hover:underline">Forgot password?</a>
             </div>
-            <input 
-              type="password" 
+            <input
+              type="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
-              placeholder="••••••••" 
+              placeholder="••••••••"
               className="glass-input"
-              required 
+              required
             />
           </div>
 

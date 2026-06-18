@@ -7,18 +7,25 @@ const http = require('http');
 const { Server } = require('socket.io');
 
 const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/users');
+const postRoutes = require('./routes/posts');
+const projectRoutes = require('./routes/projects');
+const noteRoutes = require('./routes/notes');
+const communityRoutes = require('./routes/communities');
+const messageRoutes = require('./routes/messages');
+const notificationRoutes = require('./routes/notifications');
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: true,
     credentials: true
   }
 });
 
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: true,
   credentials: true
 }));
 app.use(express.json());
@@ -26,6 +33,17 @@ app.use(cookieParser());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/posts', postRoutes);
+app.use('/api/projects', projectRoutes);
+app.use('/api/notes', noteRoutes);
+app.use('/api/communities', communityRoutes);
+app.use('/api/messages', messageRoutes);
+app.use('/api/notifications', notificationRoutes);
+
+app.get('/api/health', (req, res) => {
+  res.json({ success: true, message: "Vynk API is running" });
+});
 
 // Socket.io integration
 io.on('connection', (socket) => {

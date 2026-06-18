@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserPlus } from 'lucide-react';
-import axios from 'axios';
+import api from '../api/axios';
+import { AuthContext } from '../context/AuthContext';
 
 const Register = () => {
   const navigate = useNavigate();
+  const { register } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -21,12 +23,10 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/register', formData, {
-        withCredentials: true
-      });
+      const res = await api.post('/auth/register', formData);
       console.log('Registered:', res.data);
-      // Navigate to home feed
-      navigate('/');
+      register(res.data.token, res.data.user);
+      navigate('/feed');
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed');
     }
@@ -34,7 +34,7 @@ const Register = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -55,46 +55,46 @@ const Register = () => {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium text-vynk-charcoal/80">Username</label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               name="username"
               value={formData.username}
               onChange={handleChange}
-              placeholder="Choose a username" 
+              placeholder="Choose a username"
               className="glass-input"
-              required 
+              required
             />
           </div>
 
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium text-vynk-charcoal/80">Email</label>
-            <input 
-              type="email" 
+            <input
+              type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="Enter your email" 
+              placeholder="Enter your email"
               className="glass-input"
-              required 
+              required
             />
           </div>
-          
+
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium text-vynk-charcoal/80">Password</label>
-            <input 
-              type="password" 
+            <input
+              type="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
-              placeholder="Create a password" 
+              placeholder="Create a password"
               className="glass-input"
-              required 
+              required
             />
           </div>
 
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium text-vynk-charcoal/80">I am a...</label>
-            <select 
+            <select
               name="role"
               value={formData.role}
               onChange={handleChange}
