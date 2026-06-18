@@ -92,6 +92,27 @@ io.on('connection', (socket) => {
     if (receiverId) io.to(receiverId).emit('messageDeleted', { messageId });
   });
 
+  // WebRTC signaling
+  socket.on('callUser', ({ to, from, callType, signal }) => {
+    io.to(to).emit('incomingCall', { from, callType, signal });
+  });
+
+  socket.on('answerCall', ({ to, signal }) => {
+    io.to(to).emit('callAccepted', { signal });
+  });
+
+  socket.on('rejectCall', ({ to }) => {
+    io.to(to).emit('callRejected');
+  });
+
+  socket.on('endCall', ({ to }) => {
+    io.to(to).emit('callEnded');
+  });
+
+  socket.on('iceCandidate', ({ to, candidate }) => {
+    io.to(to).emit('iceCandidate', { candidate });
+  });
+
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
     const userId = socket.userId;

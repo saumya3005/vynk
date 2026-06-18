@@ -4,13 +4,28 @@ import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { User, Bell, Shield, Palette, LogOut, RefreshCw, ChevronRight } from 'lucide-react';
 import toast from 'react-hot-toast';
+import api from '../api/axios';
 
 const Settings = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const [theme, setTheme] = useState('light');
   const [notifications, setNotifications] = useState({ posts: true, messages: true, follows: true, communities: false });
-  const [privacy, setPrivacy] = useState({ profilePublic: true, showOnline: true, showActivity: true });
+  const [privacy, setPrivacy] = useState({
+    profileVisibility: user?.profileVisibility || 'public',
+    allowMessagesFrom: user?.allowMessagesFrom || 'everyone'
+  });
+
+  const savePrivacy = async (key, val) => {
+    const newPrivacy = { ...privacy, [key]: val };
+    setPrivacy(newPrivacy);
+    try {
+      await api.put('/users/privacy', newPrivacy);
+      toast.success('Privacy settings saved');
+    } catch (err) {
+      toast.error('Failed to save settings');
+    }
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -94,16 +109,22 @@ const Settings = () => {
         <div className="glass-card p-6 mb-6">
           <h2 className="text-lg font-bold text-vynk-text mb-4 flex items-center gap-2"><Shield size={20} className="text-emerald-500" /> Privacy</h2>
           <div className="flex flex-col gap-4">
-            {[
-              { key: 'profilePublic', label: 'Public Profile' },
-              { key: 'showOnline', label: 'Show Online Status' },
-              { key: 'showActivity', label: 'Show Activity Status' },
-            ].map(item => (
-              <div key={item.key} className="flex items-center justify-between">
-                <span className="text-sm font-medium text-vynk-text">{item.label}</span>
-                <Toggle checked={privacy[item.key]} onChange={(val) => setPrivacy(prev => ({ ...prev, [item.key]: val }))} />
-              </div>
-            ))}
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-vynk-text">Public Profile</span>
+              <Toggle checked={privacy.profileVisibility === 'public'} onChange={(val) => savePrivacy('profileVisibility', val ? 'public' : 'private')} />
+            </div>
+            <div className="flex flex-col gap-2">
+              <span className="text-sm font-medium text-vynk-text">Allow Messages From</span>
+              <select
+                value={privacy.allowMessagesFrom}
+                onChange={(e) => savePrivacy('allowMessagesFrom', e.target.value)}
+                className="glass-input text-sm p-2 bg-white/50"
+              >
+                <option value="everyone">Everyone</option>
+                <option value="followers">Followers</option>
+                <option value="none">No one</option>
+              </select>
+            </div>
           </div>
         </div>
 

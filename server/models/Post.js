@@ -16,7 +16,8 @@ const postSchema = new mongoose.Schema({
   tags: [{ type: String }],
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   saves: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  comments: [commentSchema]
+  comments: [commentSchema],
+  shares: { type: Number, default: 0 }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Post', postSchema);

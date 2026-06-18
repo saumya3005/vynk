@@ -39,7 +39,11 @@ const userSchema = new mongoose.Schema({
   savedProjects: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Project' }],
   savedNotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Note' }],
   isOnline: { type: Boolean, default: false },
-  lastSeen: { type: Date, default: Date.now }
+  lastSeen: { type: Date, default: Date.now },
+  profileVisibility: { type: String, enum: ['public', 'private'], default: 'public' },
+  allowMessagesFrom: { type: String, enum: ['everyone', 'followers', 'none'], default: 'everyone' },
+  resetPasswordToken: { type: String },
+  resetPasswordExpire: { type: Date }
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

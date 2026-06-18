@@ -11,12 +11,16 @@ const reelSchema = new mongoose.Schema({
   videoUrl: { type: String, required: true },
   publicId: { type: String, default: '' },
   thumbnail: { type: String, default: '' },
-  thumbnailPublicId: { type: String, default: '' },
   caption: { type: String, default: '' },
   audioTitle: { type: String, default: '' },
+  audioUrl: { type: String, default: '' },
+  musicName: { type: String, default: '' },
+  musicArtist: { type: String, default: '' },
+  filter: { type: String, default: 'Original' },
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   saves: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   comments: [commentSchema],
+  shares: { type: Number, default: 0 },
   views: { type: Number, default: 0 }
 }, { timestamps: true });
 

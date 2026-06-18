@@ -1,11 +1,12 @@
 import { useState, useEffect, useContext, useRef } from 'react';
-import { Send, Search, MessageCircle, X, Paperclip, Smile, Image as ImageIcon, Video, FileText, Trash2, Reply, ChevronLeft } from 'lucide-react';
+import { Send, Search, MessageCircle, X, Paperclip, Smile, Image as ImageIcon, Video, FileText, Trash2, Reply, ChevronLeft, Phone } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import { messageApi } from '../api/messageApi';
 import io from 'socket.io-client';
 import toast from 'react-hot-toast';
 import { formatDistanceToNow } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
+import CallModal from '../components/chat/CallModal';
 
 const STICKERS = ['😂', '🔥', '❤️', '🎉', '👏', '😎', '🚀', '✨', '🥳', '😭', '💯', '🙏', '👀', '🤯', '💪', '🫡'];
 const REACTION_EMOJIS = ['❤️', '😂', '😮', '😢', '😡', '👍'];
@@ -33,6 +34,7 @@ const Chat = () => {
   const [reactingTo, setReactingTo] = useState(null);
   const [typingUsers, setTypingUsers] = useState(new Set());
   const [showMobileSidebar, setShowMobileSidebar] = useState(true);
+  const [activeCall, setActiveCall] = useState(null);
 
   // File preview
   const [previewFile, setPreviewFile] = useState(null);
@@ -84,6 +86,10 @@ const Chat = () => {
 
     newSocket.on('messageDeleted', ({ messageId }) => {
       setMessages(prev => prev.filter(m => m._id !== messageId));
+    });
+
+    newSocket.on('incomingCall', (data) => {
+      setActiveCall({ incoming: data, type: data.callType });
     });
 
     return () => newSocket.close();
@@ -351,6 +357,14 @@ const Chat = () => {
                     ) : 'Offline'}
                   </p>
                 </div>
+                <div className="ml-auto flex items-center gap-1">
+                  <button onClick={() => setActiveCall({ type: 'voice' })} className="p-2 rounded-full hover:bg-white/80 text-vynk-muted transition-colors">
+                    <Phone size={18} />
+                  </button>
+                  <button onClick={() => setActiveCall({ type: 'video' })} className="p-2 rounded-full hover:bg-white/80 text-vynk-muted transition-colors">
+                    <Video size={20} />
+                  </button>
+                </div>
               </div>
 
               {/* Messages */}
@@ -568,6 +582,17 @@ const Chat = () => {
           )}
         </div>
       </div>
+
+      {activeCall && (
+        <CallModal
+          socket={socket}
+          user={user}
+          callee={activeCall.incoming ? null : activeChatUser}
+          callType={activeCall.type}
+          incomingCall={activeCall.incoming}
+          onClose={() => setActiveCall(null)}
+        />
+      )}
     </div>
   );
 };

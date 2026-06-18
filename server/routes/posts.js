@@ -63,6 +63,18 @@ router.put('/:id/like', auth, async (req, res) => {
     const index = post.likes.indexOf(req.user.id);
     if (index === -1) {
       post.likes.push(req.user.id);
+      
+      if (post.author.toString() !== req.user.id) {
+        const Notification = require('../models/Notification');
+        const User = require('../models/User');
+        const user = await User.findById(req.user.id);
+        await Notification.create({
+          user: post.author,
+          type: 'like',
+          message: `${user.username} liked your post.`,
+          link: `/profile/${post.author}` // or link to post
+        });
+      }
     } else {
       post.likes.splice(index, 1);
     }
@@ -108,12 +120,39 @@ router.post('/:id/comments', auth, async (req, res) => {
     post.comments.push(newComment);
     await post.save();
 
+    if (post.author.toString() !== req.user.id) {
+      const Notification = require('../models/Notification');
+      const User = require('../models/User');
+      const user = await User.findById(req.user.id);
+      await Notification.create({
+        user: post.author,
+        type: 'comment',
+        message: `${user.username} commented on your post.`,
+        link: `/profile/${post.author}`
+      });
+    }
+
     const populatedPost = await Post.findById(req.params.id)
       .populate('comments.author', 'username avatar');
       
     res.json(populatedPost.comments);
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Share post (increment count)
+router.post('/:id/share', auth, async (req, res) => {
+  try {
+    const post = await Post.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { shares: 1 } },
+      { new: true }
+    );
+    if (!post) return res.status(404).json({ success: false, message: 'Post not found' });
+    res.json({ shares: post.shares });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message || 'Server error' });
   }
 });
 
