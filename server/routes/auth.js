@@ -27,7 +27,7 @@ router.post('/register', async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    user = new User({
+    const user = new User({
       username,
       email,
       password: hashedPassword,
@@ -94,7 +94,7 @@ router.get('/me', auth, async (req, res) => {
 // Logout
 router.post('/logout', (req, res) => {
   res.cookie('token', '', { expires: new Date(0) });
-  res.json({ message: 'Logged out successfully' });
+  res.json({ success: true, message: 'Logged out successfully' });
 });
 
 module.exports = router;

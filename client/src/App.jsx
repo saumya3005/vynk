@@ -22,6 +22,7 @@ import Chat from './pages/Chat';
 import Notifications from './pages/Notifications';
 import RecruiterDashboard from './pages/RecruiterDashboard';
 import Dashboard from './pages/Dashboard';
+import Settings from './pages/Settings';
 
 function App() {
   const location = useLocation();
@@ -59,6 +60,8 @@ function App() {
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/recruiter" element={<RecruiterDashboard />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/create-project" element={<CreateProject />} />
             
             {/* Future Overhaul Routes */}
             <Route path="/stories" element={<Stories />} />

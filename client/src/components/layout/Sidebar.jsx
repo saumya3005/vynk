@@ -1,9 +1,10 @@
-import { Link, useLocation } from 'react-router-dom';
-import { Home, Compass, Briefcase, BookOpen, Users, MessageSquare, Bell, LayoutDashboard, User, PlayCircle } from 'lucide-react';
-import { useContext } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Home, Compass, Briefcase, BookOpen, Users, MessageSquare, Bell, LayoutDashboard, User, PlayCircle, LogOut, Settings, UserCog, RefreshCw } from 'lucide-react';
+import { useContext, useState, useRef, useEffect } from 'react';
 import { AuthContext } from '../../context/AuthContext';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import GlobalCreateDropdown from '../ui/GlobalCreateDropdown';
+import toast from 'react-hot-toast';
 
 const NAV_ITEMS = [
   { icon: Home, label: 'Feed', path: '/feed' },
@@ -18,8 +19,35 @@ const NAV_ITEMS = [
 ];
 
 const Sidebar = () => {
-  const { user } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
   const location = useLocation();
+  const navigate = useNavigate();
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setShowUserMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleLogout = async () => {
+    setShowUserMenu(false);
+    await logout();
+    toast.success('Logged out successfully');
+    navigate('/login');
+  };
+
+  const handleSwitchAccount = () => {
+    setShowUserMenu(false);
+    logout();
+    toast('Login with another account', { icon: '🔄' });
+    navigate('/login');
+  };
 
   return (
     <aside className="hidden md:flex flex-col w-64 h-screen fixed left-0 top-0 border-r border-vynk-border bg-vynk-bg-2/50 backdrop-blur-xl z-40 p-6">
@@ -66,15 +94,47 @@ const Sidebar = () => {
 
       <GlobalCreateDropdown />
 
-      <Link to="/profile" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/60 transition-colors mt-auto group">
-        <div className="w-10 h-10 rounded-full bg-linear-to-tr from-vynk-secondary to-vynk-accent border-2 border-transparent group-hover:border-vynk-primary transition-all overflow-hidden shrink-0">
-           {user?.avatar && <img src={user.avatar} alt="avatar" className="w-full h-full object-cover" />}
-        </div>
-        <div className="overflow-hidden">
-          <p className="font-bold text-sm truncate">{user?.username || 'User'}</p>
-          <p className="text-xs text-vynk-muted truncate">View Profile</p>
-        </div>
-      </Link>
+      {/* User profile card with dropdown menu */}
+      <div className="relative mt-auto" ref={menuRef}>
+        <button
+          onClick={() => setShowUserMenu(!showUserMenu)}
+          className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/60 transition-colors w-full group text-left"
+        >
+          <div className="w-10 h-10 rounded-full bg-linear-to-tr from-vynk-secondary to-vynk-accent border-2 border-transparent group-hover:border-vynk-primary transition-all overflow-hidden shrink-0">
+             {user?.avatar && <img src={user.avatar} alt="avatar" className="w-full h-full object-cover" />}
+          </div>
+          <div className="overflow-hidden flex-1">
+            <p className="font-bold text-sm truncate">{user?.username || 'User'}</p>
+            <p className="text-xs text-vynk-muted truncate">{user?.role || 'Member'}</p>
+          </div>
+        </button>
+
+        <AnimatePresence>
+          {showUserMenu && (
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+              transition={{ duration: 0.15 }}
+              className="absolute bottom-full left-0 w-full mb-2 bg-white rounded-xl shadow-xl border border-vynk-border overflow-hidden z-50"
+            >
+              <button onClick={() => { setShowUserMenu(false); navigate('/profile'); }} className="flex items-center gap-3 w-full p-3 hover:bg-vynk-bg-2 transition-colors text-sm font-semibold text-vynk-text text-left">
+                <User size={18} className="text-vynk-primary" /> View Profile
+              </button>
+              <button onClick={() => { setShowUserMenu(false); navigate('/settings'); }} className="flex items-center gap-3 w-full p-3 hover:bg-vynk-bg-2 transition-colors text-sm font-semibold text-vynk-text text-left">
+                <Settings size={18} className="text-vynk-muted" /> Settings
+              </button>
+              <button onClick={handleSwitchAccount} className="flex items-center gap-3 w-full p-3 hover:bg-vynk-bg-2 transition-colors text-sm font-semibold text-vynk-text text-left">
+                <RefreshCw size={18} className="text-vynk-secondary" /> Switch Account
+              </button>
+              <div className="border-t border-vynk-border"></div>
+              <button onClick={handleLogout} className="flex items-center gap-3 w-full p-3 hover:bg-red-50 transition-colors text-sm font-semibold text-red-500 text-left">
+                <LogOut size={18} /> Logout
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </aside>
   );
 };
