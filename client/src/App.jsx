@@ -1,10 +1,13 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ProtectedRoute from './components/ProtectedRoute';
-import Navbar from './components/Navbar';
+import AppShell from './components/layout/AppShell';
 import Feed from './pages/Feed';
+import Reels from './pages/Reels';
+import Stories from './pages/Stories';
 import Profile from './pages/Profile';
 import Explore from './pages/Explore';
 import Projects from './pages/Projects';
@@ -20,37 +23,44 @@ import RecruiterDashboard from './pages/RecruiterDashboard';
 import Dashboard from './pages/Dashboard';
 
 function App() {
+  const location = useLocation();
+
   return (
     <div className="w-full min-h-screen flex flex-col">
-      <Navbar />
-      <div className="flex-1">
-        <Routes>
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
           {/* Public Routes */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* Protected Routes */}
-          <Route path="/feed" element={<ProtectedRoute><Feed /></ProtectedRoute>} />
-          <Route path="/profile/:id" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-          <Route path="/explore" element={<ProtectedRoute><Explore /></ProtectedRoute>} />
-          
-          <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
-          <Route path="/projects/create" element={<ProtectedRoute><CreateProject /></ProtectedRoute>} />
-          <Route path="/projects/:id" element={<ProtectedRoute><ProjectDetails /></ProtectedRoute>} />
-          
-          <Route path="/notes" element={<ProtectedRoute><Notes /></ProtectedRoute>} />
-          <Route path="/notes/upload" element={<ProtectedRoute><UploadNotes /></ProtectedRoute>} />
-          
-          <Route path="/communities" element={<ProtectedRoute><Communities /></ProtectedRoute>} />
-          <Route path="/communities/:id" element={<ProtectedRoute><CommunityDetails /></ProtectedRoute>} />
-          
-          <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
-          <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
-          <Route path="/recruiter" element={<ProtectedRoute><RecruiterDashboard /></ProtectedRoute>} />
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          {/* Protected App Routes inside AppShell */}
+          <Route element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
+            <Route path="/feed" element={<Feed />} />
+            <Route path="/profile/:id" element={<Profile />} />
+            <Route path="/explore" element={<Explore />} />
+            
+            <Route path="/projects" element={<Projects />} />
+            <Route path="/projects/create" element={<CreateProject />} />
+            <Route path="/projects/:id" element={<ProjectDetails />} />
+            
+            <Route path="/notes" element={<Notes />} />
+            <Route path="/notes/upload" element={<UploadNotes />} />
+            
+            <Route path="/communities" element={<Communities />} />
+            <Route path="/communities/:id" element={<CommunityDetails />} />
+            
+            <Route path="/chat" element={<Chat />} />
+            <Route path="/notifications" element={<Notifications />} />
+            <Route path="/recruiter" element={<RecruiterDashboard />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            
+            {/* Future Overhaul Routes */}
+            <Route path="/stories" element={<Stories />} />
+            <Route path="/reels" element={<Reels />} />
+          </Route>
         </Routes>
-      </div>
+      </AnimatePresence>
     </div>
   );
 }
