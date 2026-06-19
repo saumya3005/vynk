@@ -21,6 +21,10 @@ export const postApi = {
     const res = await api.put(`/posts/${id}/save`);
     return res.data;
   },
+  sharePost: async (id) => {
+    const res = await api.post(`/posts/${id}/share`);
+    return res.data;
+  },
   addComment: async (id, text) => {
     const res = await api.post(`/posts/${id}/comments`, { text });
     return res.data;

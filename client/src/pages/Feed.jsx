@@ -56,10 +56,31 @@ const PostCard = ({ post: initialPost, onDelete }) => {
   const handleAddComment = async (text) => {
     try {
       const newComment = await postApi.addComment(post._id, text);
-      setPost(prev => ({ ...prev, comments: [...prev.comments, newComment] }));
+      setPost(prev => ({ ...prev, comments: newComment }));
       toast.success('Comment added');
     } catch (err) {
       toast.error('Failed to add comment');
+    }
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    try {
+      const updatedComments = await postApi.deleteComment(post._id, commentId);
+      setPost(prev => ({ ...prev, comments: updatedComments }));
+      toast.success('Comment deleted');
+    } catch (err) {
+      toast.error('Failed to delete comment');
+    }
+  };
+
+  const handleShare = async () => {
+    try {
+      const res = await postApi.sharePost(post._id);
+      setPost(prev => ({ ...prev, shares: res.shares }));
+      navigator.clipboard.writeText(`${window.location.origin}/post/${post._id}`);
+      toast.success('Link copied & post shared!');
+    } catch (err) {
+      toast.error('Failed to share post');
     }
   };
 
@@ -119,8 +140,9 @@ const PostCard = ({ post: initialPost, onDelete }) => {
               <span className="text-sm font-semibold">{post.comments?.length || 0}</span>
             </button>
             
-            <button className="flex items-center gap-2 text-vynk-muted hover:text-vynk-text transition-colors">
+            <button onClick={handleShare} className="flex items-center gap-2 text-vynk-muted hover:text-vynk-text transition-colors">
               <Share2 size={20} />
+              <span className="text-sm font-semibold">{post.shares || 0}</span>
             </button>
           </div>
           
@@ -139,7 +161,7 @@ const PostCard = ({ post: initialPost, onDelete }) => {
         onAddComment={handleAddComment}
         currentUser={user}
         onLikeComment={() => {}} // placeholder for nested comment likes
-        onDeleteComment={() => {}} // placeholder for deleting comments
+        onDeleteComment={handleDeleteComment}
       />
     </>
   );

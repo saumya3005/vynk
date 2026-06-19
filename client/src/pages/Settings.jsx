@@ -13,7 +13,8 @@ const Settings = () => {
   const [notifications, setNotifications] = useState({ posts: true, messages: true, follows: true, communities: false });
   const [privacy, setPrivacy] = useState({
     profileVisibility: user?.profileVisibility || 'public',
-    allowMessagesFrom: user?.allowMessagesFrom || 'everyone'
+    allowMessagesFrom: user?.allowMessagesFrom || 'everyone',
+    twoFactorEnabled: user?.twoFactorEnabled || false
   });
 
   const savePrivacy = async (key, val) => {
@@ -105,20 +106,32 @@ const Settings = () => {
           </div>
         </div>
 
-        {/* Privacy */}
+        {/* Security & Privacy */}
         <div className="glass-card p-6 mb-6">
-          <h2 className="text-lg font-bold text-vynk-text mb-4 flex items-center gap-2"><Shield size={20} className="text-emerald-500" /> Privacy</h2>
-          <div className="flex flex-col gap-4">
+          <h2 className="text-lg font-bold text-vynk-text mb-4 flex items-center gap-2"><Shield size={20} className="text-emerald-500" /> Security & Privacy</h2>
+          <div className="flex flex-col gap-5">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-vynk-text">Public Profile</span>
+              <div>
+                <span className="text-sm font-semibold text-vynk-text block">Public Profile</span>
+                <span className="text-xs text-vynk-muted">Allow non-followers to see your full profile</span>
+              </div>
               <Toggle checked={privacy.profileVisibility === 'public'} onChange={(val) => savePrivacy('profileVisibility', val ? 'public' : 'private')} />
             </div>
-            <div className="flex flex-col gap-2">
-              <span className="text-sm font-medium text-vynk-text">Allow Messages From</span>
+            
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-sm font-semibold text-vynk-text block">Two-Step Verification (2FA)</span>
+                <span className="text-xs text-vynk-muted">Require an email code when logging in</span>
+              </div>
+              <Toggle checked={privacy.twoFactorEnabled} onChange={(val) => savePrivacy('twoFactorEnabled', val)} />
+            </div>
+
+            <div className="flex flex-col gap-2 pt-2 border-t border-vynk-border/50">
+              <span className="text-sm font-semibold text-vynk-text">Allow Messages From</span>
               <select
                 value={privacy.allowMessagesFrom}
                 onChange={(e) => savePrivacy('allowMessagesFrom', e.target.value)}
-                className="glass-input text-sm p-2 bg-white/50"
+                className="glass-input text-sm p-2.5 bg-white/50"
               >
                 <option value="everyone">Everyone</option>
                 <option value="followers">Followers</option>

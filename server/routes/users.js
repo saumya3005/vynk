@@ -198,9 +198,10 @@ router.put('/privacy', auth, async (req, res) => {
 
     if (req.body.profileVisibility) user.profileVisibility = req.body.profileVisibility;
     if (req.body.allowMessagesFrom) user.allowMessagesFrom = req.body.allowMessagesFrom;
+    if (typeof req.body.twoFactorEnabled === 'boolean') user.twoFactorEnabled = req.body.twoFactorEnabled;
 
     await user.save();
-    res.json({ success: true, profileVisibility: user.profileVisibility, allowMessagesFrom: user.allowMessagesFrom });
+    res.json({ success: true, profileVisibility: user.profileVisibility, allowMessagesFrom: user.allowMessagesFrom, twoFactorEnabled: user.twoFactorEnabled });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message || 'Server error' });
   }

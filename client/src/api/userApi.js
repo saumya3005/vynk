@@ -20,5 +20,17 @@ export const userApi = {
   followUser: async (id) => {
     const res = await api.put(`/users/${id}/follow`);
     return res.data;
+  },
+  getSuggestions: async () => {
+    const res = await api.get('/users/suggestions');
+    return res.data;
+  },
+  getFollowers: async (id) => {
+    const res = await api.get(`/users/${id}/followers`);
+    return res.data;
+  },
+  getFollowing: async (id) => {
+    const res = await api.get(`/users/${id}/following`);
+    return res.data;
   }
 };

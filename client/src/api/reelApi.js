@@ -17,8 +17,12 @@ export const reelApi = {
     const res = await axiosInstance.put(`/reels/${id}/save`);
     return res.data;
   },
-  commentReel: async (id, text) => {
+  addComment: async (id, text) => {
     const res = await axiosInstance.post(`/reels/${id}/comment`, { text });
+    return res.data;
+  },
+  shareReel: async (id) => {
+    const res = await axiosInstance.post(`/reels/${id}/share`);
     return res.data;
   },
   viewReel: async (id) => {

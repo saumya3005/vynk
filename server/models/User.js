@@ -43,7 +43,10 @@ const userSchema = new mongoose.Schema({
   profileVisibility: { type: String, enum: ['public', 'private'], default: 'public' },
   allowMessagesFrom: { type: String, enum: ['everyone', 'followers', 'none'], default: 'everyone' },
   resetPasswordToken: { type: String },
-  resetPasswordExpire: { type: Date }
+  resetPasswordExpire: { type: Date },
+  twoFactorEnabled: { type: Boolean, default: false },
+  twoFactorCode: { type: String },
+  twoFactorExpire: { type: Date }
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

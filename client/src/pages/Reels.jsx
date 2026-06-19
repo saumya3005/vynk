@@ -28,10 +28,21 @@ const ReelCard = ({ reel: initialReel }) => {
   const handleAddComment = async (text) => {
     try {
       const newComment = await reelApi.addComment(reel._id, text);
-      setReel(prev => ({ ...prev, comments: [...(prev.comments || []), newComment] }));
+      setReel(prev => ({ ...prev, comments: newComment }));
       toast.success('Comment added');
     } catch (err) {
       toast.error('Failed to add comment');
+    }
+  };
+
+  const handleShare = async () => {
+    try {
+      const res = await reelApi.shareReel(reel._id);
+      setReel(prev => ({ ...prev, shares: res.shares }));
+      navigator.clipboard.writeText(`${window.location.origin}/reels/${reel._id}`);
+      toast.success('Link copied & reel shared!');
+    } catch (err) {
+      toast.error('Failed to share reel');
     }
   };
 
@@ -65,10 +76,11 @@ const ReelCard = ({ reel: initialReel }) => {
           <span className="text-white text-xs font-bold shadow-black drop-shadow-md">{reel.comments?.length || 0}</span>
         </button>
 
-        <button className="flex flex-col items-center gap-1 group">
+        <button onClick={handleShare} className="flex flex-col items-center gap-1 group">
           <div className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-black/60 transition-colors">
             <Share2 size={24} />
           </div>
+          <span className="text-white text-xs font-bold shadow-black drop-shadow-md">{reel.shares || 0}</span>
         </button>
       </div>
 
@@ -105,7 +117,17 @@ const Reels = () => {
   const [showUploader, setShowUploader] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [caption, setCaption] = useState('');
+  const [selectedMusic, setSelectedMusic] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
+
+  const MUSIC_LIBRARY = [
+    { id: 1, name: 'Lo-Fi Study', artist: 'Chillhop' },
+    { id: 2, name: 'Hackathon Energy', artist: 'Synthwave' },
+    { id: 3, name: 'Soft Vibes', artist: 'Acoustic' },
+    { id: 4, name: 'Dream Pop', artist: 'Indie' },
+    { id: 5, name: 'Chill Coding', artist: 'Ambient' },
+    { id: 6, name: 'Startup Beat', artist: 'Electronic' },
+  ];
 
   const fetchReels = async () => {
     setIsLoading(true);
@@ -131,7 +153,8 @@ const Reels = () => {
       try {
         const payload = {
           videoUrl: reader.result,
-          caption: caption
+          caption: caption,
+          audioTitle: selectedMusic ? `${selectedMusic.name} - ${selectedMusic.artist}` : 'Original Audio'
         };
         
         const newReel = await reelApi.createReel(payload);
@@ -140,6 +163,7 @@ const Reels = () => {
         setShowUploader(false);
         setSelectedFile(null);
         setCaption('');
+        setSelectedMusic(null);
       } catch (err) {
         toast.error(err.response?.data?.message || 'Failed to upload reel');
       } finally {
@@ -173,13 +197,31 @@ const Reels = () => {
                  <MediaUploader onFileSelect={setSelectedFile} accept="video/*" label="Upload Video (Max 1min)" />
               </div>
               {selectedFile && (
-                <textarea 
-                  placeholder="Write a catchy caption..."
-                  className="glass-input w-full mb-4"
-                  rows="3"
-                  value={caption}
-                  onChange={(e) => setCaption(e.target.value)}
-                />
+                <>
+                  <textarea 
+                    placeholder="Write a catchy caption..."
+                    className="glass-input w-full mb-4"
+                    rows="3"
+                    value={caption}
+                    onChange={(e) => setCaption(e.target.value)}
+                  />
+                  <div className="mb-4">
+                    <label className="text-sm font-semibold text-vynk-text mb-1 block">Add Music</label>
+                    <select
+                      className="glass-input w-full"
+                      value={selectedMusic?.id || ''}
+                      onChange={(e) => {
+                        const m = MUSIC_LIBRARY.find(x => x.id === parseInt(e.target.value));
+                        setSelectedMusic(m || null);
+                      }}
+                    >
+                      <option value="">Original Audio</option>
+                      {MUSIC_LIBRARY.map(m => (
+                        <option key={m.id} value={m.id}>{m.name} - {m.artist}</option>
+                      ))}
+                    </select>
+                  </div>
+                </>
               )}
               <div className="flex gap-3">
                 <button onClick={() => setShowUploader(false)} className="flex-1 py-2 rounded-xl border border-vynk-border text-vynk-text font-bold hover:bg-white/5 transition-colors">Cancel</button>
