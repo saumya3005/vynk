@@ -17,36 +17,40 @@ const notificationRoutes = require('./routes/notifications');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: function(origin, callback) {
-      if (!origin || ['http://localhost:5173', 'http://localhost:5174', 'https://vynk1.vercel.app', process.env.CLIENT_URL].filter(Boolean).includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-    credentials: true
-  }
-});
-
 const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:5174',
-  'https://vynk1.vercel.app',
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "https://vynk1.vercel.app",
   process.env.CLIENT_URL
 ].filter(Boolean);
 
-app.use(cors({
-  origin: function(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+
+    const isAllowed =
+      allowedOrigins.includes(origin) ||
+      /^https:\/\/vynk1.*\.vercel\.app$/.test(origin) ||
+      /^https:\/\/.*saumya-agraharis-projects-c6ed628f\.vercel\.app$/.test(origin);
+
+    if (isAllowed) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      console.log("CORS blocked origin:", origin);
+      callback(new Error("Not allowed by CORS"));
     }
   },
-  credentials: true
-}));
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
+
+const io = new Server(server, {
+  cors: corsOptions
+});
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cookieParser());
