@@ -1,16 +1,23 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { X, Heart, Send } from 'lucide-react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useState, useEffect, useContext } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, Heart, Send, Trash2, Eye } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { storyApi } from '../api/storyApi';
+import { AuthContext } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 
 const Stories = () => {
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
+  
   const [progress, setProgress] = useState(0);
   const [stories, setStories] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
+  
+  const [replyText, setReplyText] = useState('');
+  const [isLiking, setIsLiking] = useState(false);
 
   const fetchStories = async () => {
     setIsLoading(true);
@@ -32,7 +39,7 @@ const Stories = () => {
   }, []);
 
   useEffect(() => {
-    if (stories.length === 0 || isLoading) return;
+    if (stories.length === 0 || isLoading || isPaused) return;
 
     const timer = setInterval(() => {
       setProgress(p => {
@@ -40,11 +47,11 @@ const Stories = () => {
           handleNextStory();
           return 0;
         }
-        return p + 0.5;
+        return p + 0.3; // Slower progress
       });
     }, 30);
     return () => clearInterval(timer);
-  }, [currentIndex, stories.length, isLoading]);
+  }, [currentIndex, stories.length, isLoading, isPaused]);
 
   const handleNextStory = () => {
     if (currentIndex < stories.length - 1) {
@@ -65,10 +72,58 @@ const Stories = () => {
     }
   };
 
+  const handleLike = async () => {
+    if (!currentStory || isLiking) return;
+    setIsLiking(true);
+    try {
+      const updatedLikes = await storyApi.likeStory(currentStory._id);
+      const updatedStories = [...stories];
+      updatedStories[currentIndex].likes = updatedLikes;
+      setStories(updatedStories);
+    } catch (err) {
+      toast.error('Failed to like story');
+    } finally {
+      setIsLiking(false);
+    }
+  };
+
+  const handleReply = async (e) => {
+    e.preventDefault();
+    if (!replyText.trim() || !currentStory) return;
+    try {
+      await storyApi.replyStory(currentStory._id, replyText);
+      toast.success('Reply sent!');
+      setReplyText('');
+    } catch (err) {
+      toast.error('Failed to send reply');
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!currentStory) return;
+    const confirm = window.confirm('Delete this story?');
+    if (!confirm) return;
+    
+    try {
+      await storyApi.deleteStory(currentStory._id);
+      toast.success('Story deleted');
+      const newStories = stories.filter(s => s._id !== currentStory._id);
+      setStories(newStories);
+      if (newStories.length === 0) {
+        navigate('/feed');
+      } else if (currentIndex >= newStories.length) {
+        setCurrentIndex(newStories.length - 1);
+        setProgress(0);
+      }
+    } catch (err) {
+      toast.error('Failed to delete story');
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="fixed inset-0 z-100 bg-black flex items-center justify-center text-white">
-        <div className="w-10 h-10 border-4 border-vynk-primary border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -83,6 +138,8 @@ const Stories = () => {
   }
 
   const currentStory = stories[currentIndex];
+  const isMyStory = currentStory.author?._id === user?.id;
+  const isLiked = currentStory.likes?.includes(user?.id);
 
   return (
     <div className="fixed inset-0 z-100 bg-black flex items-center justify-center">
@@ -92,12 +149,12 @@ const Stories = () => {
         </button>
       </div>
 
-      <div className="w-full max-w-md h-[90vh] bg-neutral-900 rounded-xl overflow-hidden relative shadow-2xl shadow-vynk-primary/10">
+      <div className="w-full max-w-md h-full md:h-[90vh] bg-neutral-900 md:rounded-xl overflow-hidden relative shadow-2xl flex flex-col" style={{ background: currentStory.mediaUrl ? '#000' : currentStory.background || '#000' }}>
         
         {/* Progress Bar */}
-        <div className="absolute top-2 left-2 right-2 flex gap-1 z-20">
+        <div className="absolute top-2 left-2 right-2 flex gap-1 z-30">
           {stories.map((_, idx) => (
-            <div key={idx} className="h-1 flex-1 bg-white/30 rounded-full overflow-hidden">
+            <div key={idx} className="h-[3px] flex-1 bg-white/30 rounded-full overflow-hidden">
               <motion.div 
                 className="h-full bg-white"
                 style={{ width: idx < currentIndex ? '100%' : idx === currentIndex ? `${progress}%` : '0%' }}
@@ -107,30 +164,79 @@ const Stories = () => {
         </div>
 
         {/* Header */}
-        <div className="absolute top-6 left-4 right-4 flex items-center gap-3 z-20">
-          <img src={currentStory.author?.avatar || 'https://via.placeholder.com/40'} alt="avatar" className="w-8 h-8 rounded-full border border-white/20 object-cover" />
-          <span className="text-white font-bold text-sm shadow-black drop-shadow-md">{currentStory.author?.username}</span>
+        <div className="absolute top-6 left-4 right-4 flex justify-between items-center z-30">
+          <div className="flex items-center gap-3">
+            <img src={currentStory.author?.avatar || 'https://via.placeholder.com/40'} alt="avatar" className="w-8 h-8 rounded-full border border-white/20 object-cover" />
+            <span className="text-white font-bold text-sm shadow-black drop-shadow-md">{currentStory.author?.username}</span>
+          </div>
+          <div className="flex gap-2">
+            {isMyStory && (
+              <button onClick={handleDelete} className="p-1 text-white hover:text-red-500 drop-shadow-md"><Trash2 size={20} /></button>
+            )}
+          </div>
         </div>
 
         {/* Media */}
-        {currentStory.mediaType === 'video' ? (
-          <video src={currentStory.mediaUrl} autoPlay muted className="w-full h-full object-cover opacity-90" />
-        ) : (
-          <img src={currentStory.mediaUrl} alt="Story" className="w-full h-full object-cover opacity-90" />
-        )}
+        <div 
+          className="flex-1 relative w-full h-full flex items-center justify-center"
+          onPointerDown={() => setIsPaused(true)}
+          onPointerUp={() => setIsPaused(false)}
+          onPointerLeave={() => setIsPaused(false)}
+        >
+          {currentStory.mediaUrl && (
+            currentStory.mediaType === 'video' ? (
+              <video src={currentStory.mediaUrl} autoPlay loop muted className="w-full h-full object-cover" />
+            ) : (
+              <img src={currentStory.mediaUrl} alt="Story" className="w-full h-full object-cover" />
+            )
+          )}
+          
+          {/* Text Overlays */}
+          {currentStory.textOverlays?.map((overlay, idx) => (
+            <div key={idx} className="absolute pointer-events-none" style={{ top: `${overlay.y}%`, left: `${overlay.x}%`, transform: 'translate(-50%, -50%)', color: overlay.color, fontSize: `${overlay.fontSize}px`, fontFamily: overlay.fontFamily, fontWeight: 'bold', textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
+              {overlay.text}
+            </div>
+          ))}
 
-        {/* Navigation Overlays */}
-        <div className="absolute inset-y-0 left-0 w-1/3 z-10 cursor-pointer" onClick={handlePrevStory}></div>
-        <div className="absolute inset-y-0 right-0 w-2/3 z-10 cursor-pointer" onClick={handleNextStory}></div>
+          {/* Navigation Tap Zones */}
+          <div className="absolute inset-y-0 left-0 w-1/3 z-20 cursor-pointer" onClick={(e) => { e.stopPropagation(); handlePrevStory(); }}></div>
+          <div className="absolute inset-y-0 right-0 w-2/3 z-20 cursor-pointer" onClick={(e) => { e.stopPropagation(); handleNextStory(); }}></div>
+        </div>
 
         {/* Footer */}
-        <div className="absolute bottom-4 left-4 right-4 z-20 flex items-center gap-3">
-          <div className="flex-1 bg-black/40 border border-white/20 rounded-full px-4 py-2 flex items-center backdrop-blur-md">
-            <input type="text" placeholder="Reply..." className="bg-transparent border-none text-white text-sm focus:outline-none w-full placeholder:text-white/60" />
-          </div>
-          <button className="text-white hover:text-vynk-primary transition-colors"><Heart size={28} /></button>
-          <button className="text-white hover:text-vynk-secondary transition-colors"><Send size={26} /></button>
+        <div className="absolute bottom-0 left-0 w-full p-4 z-30 bg-gradient-to-t from-black/80 to-transparent">
+          {isMyStory ? (
+            <div className="flex justify-between items-center text-white">
+              <div className="flex items-center gap-2">
+                <Eye size={20} /> <span className="font-bold text-sm">{currentStory.viewers?.length || 0} Viewers</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Heart size={20} /> <span className="font-bold text-sm">{currentStory.likes?.length || 0} Likes</span>
+              </div>
+            </div>
+          ) : (
+            <form onSubmit={handleReply} className="flex items-center gap-3">
+              <div className="flex-1 bg-black/40 border border-white/20 rounded-full px-4 py-2 flex items-center backdrop-blur-md">
+                <input 
+                  type="text" 
+                  value={replyText}
+                  onChange={(e) => setReplyText(e.target.value)}
+                  onFocus={() => setIsPaused(true)}
+                  onBlur={() => setIsPaused(false)}
+                  placeholder="Reply..." 
+                  className="bg-transparent border-none text-white text-sm focus:outline-none w-full placeholder:text-white/60" 
+                />
+              </div>
+              <button type="button" onClick={handleLike} className={`transition-colors ${isLiked ? 'text-primary' : 'text-white hover:text-primary drop-shadow-md'}`}>
+                <Heart size={28} className={isLiked ? 'fill-primary' : ''} />
+              </button>
+              <button type="submit" disabled={!replyText.trim()} className="text-white hover:text-secondary transition-colors disabled:opacity-50 drop-shadow-md">
+                <Send size={26} />
+              </button>
+            </form>
+          )}
         </div>
+
       </div>
     </div>
   );

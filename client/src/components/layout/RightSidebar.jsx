@@ -36,7 +36,7 @@ const RightSidebar = () => {
   };
 
   return (
-    <aside className="hidden lg:flex flex-col w-80 fixed right-0 top-0 h-screen border-l border-vynk-border bg-vynk-bg-2/30 backdrop-blur-md z-30 p-6 overflow-y-auto">
+    <aside className="hidden lg:flex flex-col w-80 fixed right-0 top-0 h-screen border-l border-border bg-surface/30 backdrop-blur-md z-30 p-6 overflow-y-auto">
       
       {/* Search */}
       <div className="mb-8 relative z-50">
@@ -46,30 +46,30 @@ const RightSidebar = () => {
       {/* Suggested People */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="font-bold text-sm text-vynk-muted uppercase tracking-wider">Suggested for you</h3>
-          <Link to="/explore" className="text-xs font-semibold text-vynk-primary hover:underline">See All</Link>
+          <h3 className="font-bold text-sm text-muted uppercase tracking-wider">Suggested for you</h3>
+          <Link to="/explore" className="text-xs font-semibold text-primary hover:underline">See All</Link>
         </div>
         <div className="flex flex-col gap-4">
           {suggestions.length > 0 ? suggestions.map(user => (
             <div key={user._id} className="flex items-center justify-between group">
               <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate(`/profile/${user._id}`)}>
-                <div className="w-10 h-10 rounded-full bg-linear-to-tr from-vynk-accent to-vynk-secondary shrink-0 overflow-hidden">
+                <div className="w-10 h-10 rounded-full bg-linear-to-tr from-accent to-secondary shrink-0 overflow-hidden">
                   {user.avatar ? <img src={user.avatar} className="w-full h-full object-cover" alt="avatar" /> : null}
                 </div>
                 <div className="overflow-hidden">
                   <p className="font-bold text-sm truncate group-hover:underline">{user.username}</p>
-                  <p className="text-xs text-vynk-muted truncate">{user.role || 'Member'}</p>
+                  <p className="text-xs text-muted truncate">{user.role || 'Member'}</p>
                 </div>
               </div>
               <button 
                 onClick={() => handleFollow(user._id)}
-                className="text-xs font-bold text-vynk-primary bg-vynk-primary/10 px-4 py-1.5 rounded-full hover:bg-vynk-primary/20 transition-colors"
+                className="text-xs font-bold text-primary bg-primary/10 px-4 py-1.5 rounded-full hover:bg-primary/20 transition-colors"
               >
                 Follow
               </button>
             </div>
           )) : (
-            <p className="text-xs text-vynk-muted">No suggestions available right now.</p>
+            <p className="text-xs text-muted">No suggestions available right now.</p>
           )}
         </div>
       </div>
@@ -77,13 +77,13 @@ const RightSidebar = () => {
       {/* Trending Projects */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="font-bold text-sm text-vynk-muted uppercase tracking-wider">Trending Projects</h3>
+          <h3 className="font-bold text-sm text-muted uppercase tracking-wider">Trending Projects</h3>
         </div>
         <div className="flex flex-col gap-3">
           {[1, 2].map(i => (
             <div key={i} className="glass-card p-3 flex flex-col gap-1 cursor-pointer group">
-              <h4 className="font-bold text-sm group-hover:text-vynk-primary transition-colors">AI Resume Builder</h4>
-              <p className="text-xs text-vynk-muted">React • Node.js • OpenAI</p>
+              <h4 className="font-bold text-sm group-hover:text-primary transition-colors">AI Resume Builder</h4>
+              <p className="text-xs text-muted">React • Node.js • OpenAI</p>
               <div className="flex items-center gap-2 mt-1">
                 <span className="w-2 h-2 rounded-full bg-green-500"></span>
                 <span className="text-xs font-medium text-green-700">Collab Open</span>
@@ -94,14 +94,14 @@ const RightSidebar = () => {
       </div>
       
       {/* Footer Links */}
-      <div className="mt-auto pt-6 border-t border-vynk-border">
-        <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-vynk-muted font-medium">
-          <a href="#" className="hover:text-vynk-text">About</a>
-          <a href="#" className="hover:text-vynk-text">Help Center</a>
-          <a href="#" className="hover:text-vynk-text">Privacy</a>
-          <a href="#" className="hover:text-vynk-text">Terms</a>
+      <div className="mt-auto pt-6 border-t border-border">
+        <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted font-medium">
+          <a href="#" className="hover:text-text">About</a>
+          <a href="#" className="hover:text-text">Help Center</a>
+          <a href="#" className="hover:text-text">Privacy</a>
+          <a href="#" className="hover:text-text">Terms</a>
         </div>
-        <p className="text-xs text-vynk-muted mt-4">© 2026 Vynk Corporation</p>
+        <p className="text-xs text-muted mt-4">© 2026 Vynk Corporation</p>
       </div>
     </aside>
   );

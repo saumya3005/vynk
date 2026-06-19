@@ -43,7 +43,7 @@ const UploadNotes = () => {
   return (
     <div className="min-h-screen pt-24 px-4 md:px-6 max-w-2xl mx-auto pb-12">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-8">
-        <h1 className="text-3xl font-bold text-vynk-charcoal mb-8">Upload Notes</h1>
+        <h1 className="text-3xl font-bold text-charcoal mb-8">Upload Notes</h1>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <div className="mb-4">

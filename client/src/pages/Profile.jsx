@@ -123,13 +123,13 @@ const Profile = () => {
   if (isLoading) {
     return (
       <div className="w-full min-h-screen flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-vynk-primary border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   if (!profileData) {
-    return <div className="text-center py-20 text-vynk-text">Profile not found</div>;
+    return <div className="text-center py-20 text-text">Profile not found</div>;
   }
 
   // Safe defaults
@@ -144,7 +144,7 @@ const Profile = () => {
   return (
     <div className="w-full max-w-5xl mx-auto pb-24 md:pb-8">
       {/* Cover Banner */}
-      <div className="h-48 md:h-64 w-full bg-linear-to-r from-vynk-primary via-vynk-secondary to-vynk-accent relative">
+      <div className="h-48 md:h-64 w-full bg-linear-to-r from-primary via-secondary to-accent relative">
         <div className="absolute inset-0 bg-white/10 backdrop-blur-3xl mix-blend-overlay"></div>
         {isOwnProfile && (
           <button className="absolute top-4 right-4 bg-black/40 hover:bg-black/60 text-white p-2 rounded-full backdrop-blur-md transition-colors">
@@ -160,12 +160,12 @@ const Profile = () => {
             <div className="relative group">
               <div 
                 onClick={() => isOwnProfile && setShowCamera(true)}
-                className={`w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-vynk-bg-1 bg-white shadow-xl overflow-hidden shrink-0 relative ${isOwnProfile ? 'cursor-pointer' : ''}`}
+                className={`w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-bg-1 bg-white shadow-xl overflow-hidden shrink-0 relative ${isOwnProfile ? 'cursor-pointer' : ''}`}
               >
                 {profileData.avatar ? (
                   <img src={profileData.avatar} alt="Avatar" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full bg-linear-to-tr from-vynk-primary to-vynk-secondary flex items-center justify-center text-white text-4xl font-bold">
+                  <div className="w-full h-full bg-linear-to-tr from-primary to-secondary flex items-center justify-center text-white text-4xl font-bold">
                     {profileData.username?.[0]?.toUpperCase()}
                   </div>
                 )}
@@ -182,20 +182,20 @@ const Profile = () => {
                   </div>
                 )}
               </div>
-              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-vynk-text text-white text-xs font-bold px-3 py-1 rounded-full border-2 border-vynk-bg-1 shadow-md whitespace-nowrap flex items-center gap-1">
+              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-text text-white text-xs font-bold px-3 py-1 rounded-full border-2 border-bg-1 shadow-md whitespace-nowrap flex items-center gap-1">
                 <Zap size={12} className="text-yellow-400 fill-yellow-400" /> Level {stats.level}
               </div>
             </div>
 
             <div className="text-center md:text-left pb-2">
-              <h1 className="text-3xl md:text-4xl font-extrabold text-vynk-text mb-1 tracking-tight">
+              <h1 className="text-3xl md:text-4xl font-extrabold text-text mb-1 tracking-tight">
                 {profileData.username}
               </h1>
-              <p className="text-vynk-primary font-bold text-lg mb-2">{profileData.role || 'Member'}</p>
-              <div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm font-semibold text-vynk-muted">
+              <p className="text-primary font-bold text-lg mb-2">{profileData.role || 'Member'}</p>
+              <div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm font-semibold text-muted">
                 <span className="flex items-center gap-1"><MapPin size={16} /> {profileData.location || 'Earth'}</span>
                 {profileData.socialLinks?.portfolio && (
-                  <span className="flex items-center gap-1"><Globe size={16} /> <a href={profileData.socialLinks.portfolio} target="_blank" rel="noreferrer" className="hover:text-vynk-primary transition-colors">Portfolio</a></span>
+                  <span className="flex items-center gap-1"><Globe size={16} /> <a href={profileData.socialLinks.portfolio} target="_blank" rel="noreferrer" className="hover:text-primary transition-colors">Portfolio</a></span>
                 )}
               </div>
             </div>
@@ -207,7 +207,7 @@ const Profile = () => {
               <button onClick={() => setShowEditModal(true)} className="btn-secondary w-full md:w-auto">Edit Profile</button>
             ) : (
               <>
-                <button onClick={handleFollow} className={`w-full md:w-auto flex items-center justify-center gap-2 px-6 py-2.5 rounded-full font-bold transition-all shadow-md active:scale-95 ${isFollowing ? 'bg-vynk-bg-2 text-vynk-text border border-vynk-border' : 'bg-linear-to-r from-vynk-primary to-vynk-accent text-white'}`}>
+                <button onClick={handleFollow} className={`w-full md:w-auto flex items-center justify-center gap-2 px-6 py-2.5 rounded-full font-bold transition-all shadow-md active:scale-95 ${isFollowing ? 'bg-surface text-text border border-border' : 'bg-linear-to-r from-primary to-accent text-white'}`}>
                   {isFollowing ? <><UserCheck size={18} /> Following</> : <><UserPlus size={18} /> Follow</>}
                 </button>
                 <button className="btn-secondary w-full md:w-auto"><MessageCircle size={18} /> Message</button>
@@ -225,22 +225,22 @@ const Profile = () => {
             <div className="glass-card p-6 flex flex-col gap-4">
               <div className="flex justify-between items-center text-center">
                 <div>
-                  <p className="text-2xl font-bold text-vynk-text">{stats.followers}</p>
-                  <p className="text-xs font-bold text-vynk-muted uppercase tracking-wider">Followers</p>
+                  <p className="text-2xl font-bold text-text">{stats.followers}</p>
+                  <p className="text-xs font-bold text-muted uppercase tracking-wider">Followers</p>
                 </div>
-                <div className="w-px h-8 bg-vynk-border"></div>
+                <div className="w-px h-8 bg-border"></div>
                 <div>
-                  <p className="text-2xl font-bold text-vynk-text">{stats.following}</p>
-                  <p className="text-xs font-bold text-vynk-muted uppercase tracking-wider">Following</p>
+                  <p className="text-2xl font-bold text-text">{stats.following}</p>
+                  <p className="text-xs font-bold text-muted uppercase tracking-wider">Following</p>
                 </div>
               </div>
-              <div className="border-t border-vynk-border pt-4">
+              <div className="border-t border-border pt-4">
                 <div className="flex justify-between items-end mb-2">
-                  <span className="text-xs font-bold text-vynk-muted uppercase tracking-wider">XP Progress</span>
-                  <span className="text-sm font-bold text-vynk-primary">{stats.xp % 1000} / 1000</span>
+                  <span className="text-xs font-bold text-muted uppercase tracking-wider">XP Progress</span>
+                  <span className="text-sm font-bold text-primary">{stats.xp % 1000} / 1000</span>
                 </div>
-                <div className="w-full h-2 bg-vynk-border rounded-full overflow-hidden">
-                  <div className="h-full bg-vynk-primary rounded-full" style={{ width: `${(stats.xp % 1000) / 10}%` }}></div>
+                <div className="w-full h-2 bg-border rounded-full overflow-hidden">
+                  <div className="h-full bg-primary rounded-full" style={{ width: `${(stats.xp % 1000) / 10}%` }}></div>
                 </div>
               </div>
             </div>
@@ -248,7 +248,7 @@ const Profile = () => {
             {/* About */}
             <div className="glass-card p-6">
               <h3 className="font-bold text-lg mb-3">About</h3>
-              <p className="text-vynk-text/80 leading-relaxed text-sm">
+              <p className="text-text/80 leading-relaxed text-sm">
                 {profileData.bio || `Hi, I'm ${profileData.username}! I love learning and connecting with people on Vynk.`}
               </p>
             </div>
@@ -258,7 +258,7 @@ const Profile = () => {
               <h3 className="font-bold text-lg mb-4">Skills</h3>
               <div className="flex flex-wrap gap-2">
                 {skills.map((skill) => (
-                  <span key={skill} className="px-3 py-1.5 bg-white border border-vynk-border rounded-lg text-xs font-bold text-vynk-text shadow-sm">
+                  <span key={skill} className="px-3 py-1.5 bg-white border border-border rounded-lg text-xs font-bold text-text shadow-sm">
                     {skill}
                   </span>
                 ))}
@@ -280,16 +280,16 @@ const Profile = () => {
           <div className="lg:col-span-2">
             
             {/* Tabs */}
-            <div className="flex gap-6 border-b border-vynk-border mb-6">
+            <div className="flex gap-6 border-b border-border mb-6">
               {['Posts', 'Projects', 'Notes', 'Activity'].map(tab => (
                 <button 
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`pb-4 text-sm font-bold relative transition-colors ${activeTab === tab ? 'text-vynk-text' : 'text-vynk-muted hover:text-vynk-text'}`}
+                  className={`pb-4 text-sm font-bold relative transition-colors ${activeTab === tab ? 'text-text' : 'text-muted hover:text-text'}`}
                 >
                   {tab}
                   {activeTab === tab && (
-                    <motion.div layoutId="profile-tab" className="absolute bottom-0 left-0 w-full h-0.5 bg-vynk-text rounded-t-full" />
+                    <motion.div layoutId="profile-tab" className="absolute bottom-0 left-0 w-full h-0.5 bg-text rounded-t-full" />
                   )}
                 </button>
               ))}
@@ -297,11 +297,11 @@ const Profile = () => {
 
             {/* Tab Content */}
             <div className="glass-card p-12 flex flex-col items-center justify-center text-center">
-              <div className="w-20 h-20 bg-vynk-bg-2 rounded-full flex items-center justify-center mb-4 text-vynk-muted">
+              <div className="w-20 h-20 bg-surface rounded-full flex items-center justify-center mb-4 text-muted">
                 <MessageCircle size={32} />
               </div>
-              <h3 className="text-xl font-bold text-vynk-text mb-2">No {activeTab.toLowerCase()} yet</h3>
-              <p className="text-vynk-muted mb-6">When {profileData.username} creates {activeTab.toLowerCase()}, they will appear here.</p>
+              <h3 className="text-xl font-bold text-text mb-2">No {activeTab.toLowerCase()} yet</h3>
+              <p className="text-muted mb-6">When {profileData.username} creates {activeTab.toLowerCase()}, they will appear here.</p>
               {isOwnProfile && <button className="btn-primary">Create {activeTab.slice(0, -1)}</button>}
             </div>
 

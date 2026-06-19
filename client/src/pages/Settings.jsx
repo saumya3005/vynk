@@ -43,7 +43,7 @@ const Settings = () => {
   const Toggle = ({ checked, onChange }) => (
     <button
       onClick={() => onChange(!checked)}
-      className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${checked ? 'bg-vynk-primary' : 'bg-gray-300'}`}
+      className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${checked ? 'bg-primary' : 'bg-gray-300'}`}
     >
       <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200 ${checked ? 'translate-x-5' : 'translate-x-0'}`} />
     </button>
@@ -52,35 +52,35 @@ const Settings = () => {
   return (
     <div className="max-w-2xl mx-auto py-6 px-4 pb-24 md:pb-6">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-3xl font-bold text-vynk-text mb-8">Settings</h1>
+        <h1 className="text-3xl font-bold text-text mb-8">Settings</h1>
 
         {/* Account Info */}
         <div className="glass-card p-6 mb-6">
-          <h2 className="text-lg font-bold text-vynk-text mb-4 flex items-center gap-2"><User size={20} className="text-vynk-primary" /> Account</h2>
+          <h2 className="text-lg font-bold text-text mb-4 flex items-center gap-2"><User size={20} className="text-primary" /> Account</h2>
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-14 h-14 rounded-full bg-linear-to-tr from-vynk-primary to-vynk-secondary overflow-hidden shrink-0">
+            <div className="w-14 h-14 rounded-full bg-linear-to-tr from-primary to-secondary overflow-hidden shrink-0">
               {user?.avatar ? <img src={user.avatar} alt="avatar" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-white text-xl font-bold">{user?.username?.[0]?.toUpperCase()}</div>}
             </div>
             <div>
-              <p className="font-bold text-vynk-text">{user?.username}</p>
-              <p className="text-sm text-vynk-muted">{user?.email}</p>
-              <p className="text-xs text-vynk-primary font-semibold mt-1">{user?.role || 'Member'}</p>
+              <p className="font-bold text-text">{user?.username}</p>
+              <p className="text-sm text-muted">{user?.email}</p>
+              <p className="text-xs text-primary font-semibold mt-1">{user?.role || 'Member'}</p>
             </div>
           </div>
-          <button onClick={() => navigate('/profile')} className="text-sm text-vynk-primary font-semibold flex items-center gap-1 hover:underline">
+          <button onClick={() => navigate('/profile')} className="text-sm text-primary font-semibold flex items-center gap-1 hover:underline">
             Edit Profile <ChevronRight size={14} />
           </button>
         </div>
 
         {/* Theme */}
         <div className="glass-card p-6 mb-6">
-          <h2 className="text-lg font-bold text-vynk-text mb-4 flex items-center gap-2"><Palette size={20} className="text-vynk-secondary" /> Appearance</h2>
+          <h2 className="text-lg font-bold text-text mb-4 flex items-center gap-2"><Palette size={20} className="text-secondary" /> Appearance</h2>
           <div className="flex gap-3">
             {['light', 'dark', 'auto'].map(t => (
               <button
                 key={t}
                 onClick={() => { setTheme(t); toast.success(`Theme set to ${t}`); }}
-                className={`px-5 py-2.5 rounded-xl font-semibold text-sm capitalize transition-all ${theme === t ? 'bg-vynk-primary text-white shadow-md' : 'bg-white border border-vynk-border text-vynk-text hover:bg-vynk-bg-2'}`}
+                className={`px-5 py-2.5 rounded-xl font-semibold text-sm capitalize transition-all ${theme === t ? 'bg-primary text-white shadow-md' : 'bg-white border border-border text-text hover:bg-surface'}`}
               >
                 {t}
               </button>
@@ -90,7 +90,7 @@ const Settings = () => {
 
         {/* Notifications */}
         <div className="glass-card p-6 mb-6">
-          <h2 className="text-lg font-bold text-vynk-text mb-4 flex items-center gap-2"><Bell size={20} className="text-yellow-500" /> Notifications</h2>
+          <h2 className="text-lg font-bold text-text mb-4 flex items-center gap-2"><Bell size={20} className="text-yellow-500" /> Notifications</h2>
           <div className="flex flex-col gap-4">
             {[
               { key: 'posts', label: 'Post Likes & Comments' },
@@ -99,7 +99,7 @@ const Settings = () => {
               { key: 'communities', label: 'Community Updates' },
             ].map(item => (
               <div key={item.key} className="flex items-center justify-between">
-                <span className="text-sm font-medium text-vynk-text">{item.label}</span>
+                <span className="text-sm font-medium text-text">{item.label}</span>
                 <Toggle checked={notifications[item.key]} onChange={(val) => setNotifications(prev => ({ ...prev, [item.key]: val }))} />
               </div>
             ))}
@@ -108,26 +108,26 @@ const Settings = () => {
 
         {/* Security & Privacy */}
         <div className="glass-card p-6 mb-6">
-          <h2 className="text-lg font-bold text-vynk-text mb-4 flex items-center gap-2"><Shield size={20} className="text-emerald-500" /> Security & Privacy</h2>
+          <h2 className="text-lg font-bold text-text mb-4 flex items-center gap-2"><Shield size={20} className="text-emerald-500" /> Security & Privacy</h2>
           <div className="flex flex-col gap-5">
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-sm font-semibold text-vynk-text block">Public Profile</span>
-                <span className="text-xs text-vynk-muted">Allow non-followers to see your full profile</span>
+                <span className="text-sm font-semibold text-text block">Public Profile</span>
+                <span className="text-xs text-muted">Allow non-followers to see your full profile</span>
               </div>
               <Toggle checked={privacy.profileVisibility === 'public'} onChange={(val) => savePrivacy('profileVisibility', val ? 'public' : 'private')} />
             </div>
             
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-sm font-semibold text-vynk-text block">Two-Step Verification (2FA)</span>
-                <span className="text-xs text-vynk-muted">Require an email code when logging in</span>
+                <span className="text-sm font-semibold text-text block">Two-Step Verification (2FA)</span>
+                <span className="text-xs text-muted">Require an email code when logging in</span>
               </div>
               <Toggle checked={privacy.twoFactorEnabled} onChange={(val) => savePrivacy('twoFactorEnabled', val)} />
             </div>
 
-            <div className="flex flex-col gap-2 pt-2 border-t border-vynk-border/50">
-              <span className="text-sm font-semibold text-vynk-text">Allow Messages From</span>
+            <div className="flex flex-col gap-2 pt-2 border-t border-border/50">
+              <span className="text-sm font-semibold text-text">Allow Messages From</span>
               <select
                 value={privacy.allowMessagesFrom}
                 onChange={(e) => savePrivacy('allowMessagesFrom', e.target.value)}
@@ -143,8 +143,8 @@ const Settings = () => {
 
         {/* Actions */}
         <div className="glass-card p-6 flex flex-col gap-3">
-          <button onClick={handleSwitchAccount} className="flex items-center gap-3 p-3 rounded-xl hover:bg-vynk-bg-2 transition-colors text-sm font-semibold text-vynk-text w-full text-left">
-            <RefreshCw size={18} className="text-vynk-secondary" /> Switch Account
+          <button onClick={handleSwitchAccount} className="flex items-center gap-3 p-3 rounded-xl hover:bg-surface transition-colors text-sm font-semibold text-text w-full text-left">
+            <RefreshCw size={18} className="text-secondary" /> Switch Account
           </button>
           <button onClick={handleLogout} className="flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 transition-colors text-sm font-semibold text-red-500 w-full text-left">
             <LogOut size={18} /> Logout

@@ -2,26 +2,38 @@ const express = require('express');
 const router = express.Router();
 const Story = require('../models/Story');
 const auth = require('../middleware/auth');
-const upload = require('../middleware/upload');
 const cloudinary = require('../config/cloudinary');
 
 // Create story
 router.post('/', auth, async (req, res) => {
   try {
-    console.log('story body keys:', Object.keys(req.body));
-    console.log('auth user:', req.user);
-
-    if (!req.body.mediaUrl) {
-      return res.status(400).json({ success: false, message: 'mediaUrl is required' });
-    }
-
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 24);
 
+    const {
+      mediaUrl,
+      mediaType,
+      caption,
+      background,
+      textOverlays,
+      stickers,
+      musicName,
+      musicArtist,
+      musicUrl,
+      privacy
+    } = req.body;
+
     const newStory = new Story({
-      mediaUrl: req.body.mediaUrl,
-      mediaType: req.body.mediaType || 'image',
-      caption: req.body.caption || '',
+      mediaUrl: mediaUrl || '',
+      mediaType: mediaType || 'image',
+      caption: caption || '',
+      background: background || 'linear-gradient(to right, #FF5A3D, #7C3AED)',
+      textOverlays: textOverlays || [],
+      stickers: stickers || [],
+      musicName: musicName || '',
+      musicArtist: musicArtist || '',
+      musicUrl: musicUrl || '',
+      privacy: privacy || 'Everyone',
       author: req.user.id,
       expiresAt
     });
@@ -35,7 +47,7 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
-// Get all stories
+// Get all stories (filter based on privacy later if needed)
 router.get('/', auth, async (req, res) => {
   try {
     const stories = await Story.find({ expiresAt: { $gt: new Date() } })
@@ -63,6 +75,45 @@ router.post('/:id/view', auth, async (req, res) => {
   }
 });
 
+// Like story
+router.post('/:id/like', auth, async (req, res) => {
+  try {
+    const story = await Story.findById(req.params.id);
+    if (!story) return res.status(404).json({ message: 'Story not found' });
+
+    if (story.likes.includes(req.user.id)) {
+      story.likes = story.likes.filter(id => id.toString() !== req.user.id);
+    } else {
+      story.likes.push(req.user.id);
+    }
+    await story.save();
+    res.json(story.likes);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Reply to story
+router.post('/:id/reply', auth, async (req, res) => {
+  try {
+    const story = await Story.findById(req.params.id);
+    if (!story) return res.status(404).json({ message: 'Story not found' });
+
+    story.replies.push({
+      user: req.user.id,
+      message: req.body.message
+    });
+    
+    await story.save();
+    
+    // In a real app, you'd also create a Message or Notification here
+    
+    res.json(story.replies);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Delete story
 router.delete('/:id', auth, async (req, res) => {
   try {
@@ -74,8 +125,6 @@ router.delete('/:id', auth, async (req, res) => {
     }
 
     if (story.publicId) {
-      // For video, we might need resource_type: 'video', but cloudinary destroy tries image first
-      // Let's explicitly check mediaType
       await cloudinary.uploader.destroy(story.publicId, { resource_type: story.mediaType === 'video' ? 'video' : 'image' });
     }
 

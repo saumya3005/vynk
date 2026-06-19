@@ -32,28 +32,28 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-vynk-bg via-vynk-bg-2 to-vynk-bg px-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-bg via-bg-2 to-bg px-4">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
         <div className="glass-card p-8">
-          <div className="w-12 h-12 rounded-2xl bg-linear-to-tr from-vynk-primary to-vynk-secondary flex items-center justify-center mb-4">
+          <div className="w-12 h-12 rounded-2xl bg-linear-to-tr from-primary to-secondary flex items-center justify-center mb-4">
             <Lock size={24} className="text-white" />
           </div>
 
-          <h1 className="text-2xl font-bold text-vynk-text mb-2">Reset Password</h1>
-          <p className="text-vynk-muted text-sm mb-6">Choose a new password for your account.</p>
+          <h1 className="text-2xl font-bold text-text mb-2">Reset Password</h1>
+          <p className="text-muted text-sm mb-6">Choose a new password for your account.</p>
 
           {done ? (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-4">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <CheckCircle size={32} className="text-green-600" />
               </div>
-              <p className="font-bold text-vynk-text mb-2">Password Reset!</p>
-              <p className="text-sm text-vynk-muted">Redirecting to login...</p>
+              <p className="font-bold text-text mb-2">Password Reset!</p>
+              <p className="text-sm text-muted">Redirecting to login...</p>
             </motion.div>
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <div>
-                <label className="text-sm font-medium text-vynk-text mb-1 block">New Password</label>
+                <label className="text-sm font-medium text-text mb-1 block">New Password</label>
                 <div className="relative">
                   <input
                     type={showPass ? 'text' : 'password'}
@@ -64,14 +64,14 @@ const ResetPassword = () => {
                     value={form.password}
                     onChange={e => setForm(p => ({ ...p, password: e.target.value }))}
                   />
-                  <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-3 text-vynk-muted">
+                  <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-3 text-muted">
                     {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
               </div>
 
               <div>
-                <label className="text-sm font-medium text-vynk-text mb-1 block">Confirm Password</label>
+                <label className="text-sm font-medium text-text mb-1 block">Confirm Password</label>
                 <input
                   type={showPass ? 'text' : 'password'}
                   required
@@ -86,7 +86,7 @@ const ResetPassword = () => {
                 {isLoading ? 'Resetting...' : 'Reset Password'}
               </button>
 
-              <Link to="/login" className="text-center text-sm text-vynk-muted hover:text-vynk-text transition-colors">
+              <Link to="/login" className="text-center text-sm text-muted hover:text-text transition-colors">
                 Back to Login
               </Link>
             </form>

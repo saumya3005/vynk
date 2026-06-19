@@ -15,17 +15,17 @@ const EmptyState = ({
       animate={{ opacity: 1, scale: 1 }}
       className="w-full flex flex-col items-center justify-center p-12 text-center"
     >
-      <div className="w-24 h-24 mb-6 rounded-full bg-linear-to-tr from-vynk-mint/30 to-vynk-lavender/30 flex items-center justify-center relative">
+      <div className="w-24 h-24 mb-6 rounded-full bg-linear-to-tr from-mint/30 to-lavender/30 flex items-center justify-center relative">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="absolute inset-0 rounded-full border-2 border-dashed border-vynk-charcoal/10"
+          className="absolute inset-0 rounded-full border-2 border-dashed border-charcoal/10"
         ></motion.div>
-        <Icon size={40} className="text-vynk-charcoal/40" />
+        <Icon size={40} className="text-charcoal/40" />
       </div>
       
-      <h3 className="text-2xl font-bold text-vynk-charcoal mb-2">{title}</h3>
-      <p className="text-vynk-charcoal/60 mb-8 max-w-md">{description}</p>
+      <h3 className="text-2xl font-bold text-charcoal mb-2">{title}</h3>
+      <p className="text-charcoal/60 mb-8 max-w-md">{description}</p>
       
       {actionLink !== "#" && (
         <Link to={actionLink} className="btn-primary">

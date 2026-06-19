@@ -58,7 +58,7 @@ const GlobalSearch = ({ onNavigate }) => {
   return (
     <div className="relative w-full" ref={dropdownRef}>
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-vynk-muted" size={18} />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
         <input
           type="text"
           value={query}
@@ -68,10 +68,10 @@ const GlobalSearch = ({ onNavigate }) => {
           }}
           onFocus={() => { if (query.trim()) setIsOpen(true); }}
           placeholder="Search Vynk (users, skills, roles)..."
-          className="w-full bg-white/60 border border-vynk-border rounded-full py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-vynk-primary/50 focus:bg-white transition-all text-vynk-text placeholder:text-vynk-muted/80"
+          className="w-full bg-white/60 border border-border rounded-full py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:bg-white transition-all text-text placeholder:text-muted/80"
         />
         {isLoading && (
-          <Loader className="absolute right-3 top-1/2 -translate-y-1/2 text-vynk-primary animate-spin" size={16} />
+          <Loader className="absolute right-3 top-1/2 -translate-y-1/2 text-primary animate-spin" size={16} />
         )}
       </div>
 
@@ -82,21 +82,21 @@ const GlobalSearch = ({ onNavigate }) => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 5, scale: 0.98 }}
             transition={{ duration: 0.2 }}
-            className="absolute top-full left-0 w-full mt-2 bg-white rounded-2xl shadow-xl border border-vynk-border overflow-hidden z-50 max-h-96 overflow-y-auto"
+            className="absolute top-full left-0 w-full mt-2 bg-white rounded-2xl shadow-xl border border-border overflow-hidden z-50 max-h-96 overflow-y-auto"
           >
             {results.length > 0 ? (
               <div className="py-2">
-                <div className="px-4 py-2 text-xs font-bold text-vynk-muted uppercase tracking-wider bg-vynk-bg-1/50">
+                <div className="px-4 py-2 text-xs font-bold text-muted uppercase tracking-wider bg-bg/50">
                   People
                 </div>
                 {results.map((user) => (
                   <div
                     key={user._id}
-                    className="flex items-center justify-between p-3 hover:bg-vynk-bg-2 cursor-pointer transition-colors"
+                    className="flex items-center justify-between p-3 hover:bg-surface cursor-pointer transition-colors"
                     onClick={() => handleUserClick(user._id)}
                   >
                     <div className="flex items-center gap-3 overflow-hidden">
-                      <div className="w-10 h-10 rounded-full bg-linear-to-tr from-vynk-secondary to-vynk-accent shrink-0 overflow-hidden">
+                      <div className="w-10 h-10 rounded-full bg-linear-to-tr from-secondary to-accent shrink-0 overflow-hidden">
                         {user.avatar ? (
                           <img src={user.avatar} alt="avatar" className="w-full h-full object-cover" />
                         ) : (
@@ -106,8 +106,8 @@ const GlobalSearch = ({ onNavigate }) => {
                         )}
                       </div>
                       <div className="overflow-hidden">
-                        <p className="font-bold text-sm text-vynk-text truncate">{user.username}</p>
-                        <p className="text-xs text-vynk-muted truncate">{user.role || 'Member'}</p>
+                        <p className="font-bold text-sm text-text truncate">{user.username}</p>
+                        <p className="text-xs text-muted truncate">{user.role || 'Member'}</p>
                       </div>
                     </div>
                   </div>
@@ -115,7 +115,7 @@ const GlobalSearch = ({ onNavigate }) => {
               </div>
             ) : (
               !isLoading && (
-                <div className="p-6 text-center text-vynk-muted text-sm">
+                <div className="p-6 text-center text-muted text-sm">
                   No results found for "{query}"
                 </div>
               )

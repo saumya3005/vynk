@@ -96,8 +96,8 @@ const CameraCapture = ({ onCapture, onClose }) => {
                 <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center"><RefreshCcw size={20} /></div>
                 <span className="text-xs font-bold">Retake</span>
               </button>
-              <button onClick={handleConfirm} className="flex flex-col items-center gap-2 text-vynk-primary hover:text-white transition">
-                <div className="w-16 h-16 rounded-full bg-vynk-primary flex items-center justify-center text-white shadow-lg shadow-vynk-primary/40"><Check size={32} /></div>
+              <button onClick={handleConfirm} className="flex flex-col items-center gap-2 text-primary hover:text-white transition">
+                <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/40"><Check size={32} /></div>
                 <span className="text-xs font-bold">Use Photo</span>
               </button>
             </>

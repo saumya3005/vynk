@@ -88,16 +88,16 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex bg-vynk-bg-1">
+    <div className="min-h-screen flex bg-bg">
       {/* Left Hero — hidden on mobile */}
-      <div className="hidden lg:flex flex-1 relative overflow-hidden items-center justify-center bg-vynk-text">
-        <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-vynk-primary/30 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-vynk-accent/30 rounded-full blur-3xl animate-pulse delay-1000" />
-        <div className="absolute top-1/2 left-1/2 w-48 h-48 bg-vynk-secondary/20 rounded-full blur-3xl animate-pulse delay-500" />
+      <div className="hidden lg:flex flex-1 relative overflow-hidden items-center justify-center bg-text">
+        <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-primary/30 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-accent/30 rounded-full blur-3xl animate-pulse delay-1000" />
+        <div className="absolute top-1/2 left-1/2 w-48 h-48 bg-secondary/20 rounded-full blur-3xl animate-pulse delay-500" />
 
         <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }} className="relative z-10 text-center px-12">
           <h1 className="text-6xl font-black text-white tracking-tight mb-4">
-            Welcome back<span className="text-vynk-primary">.</span>
+            Welcome back<span className="text-primary">.</span>
           </h1>
           <p className="text-xl text-white/60 font-light leading-relaxed max-w-md mx-auto">
             Log in to continue building and connecting with the Vynk community.
@@ -110,15 +110,15 @@ const Login = () => {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="w-full max-w-md">
           {/* Mobile brand */}
           <div className="lg:hidden text-center mb-8">
-            <h1 className="text-3xl font-black text-vynk-text">Vynk<span className="text-vynk-primary">.</span></h1>
+            <h1 className="text-3xl font-black text-text">Vynk<span className="text-primary">.</span></h1>
           </div>
 
-          <div className="bg-white/75 backdrop-blur-xl border border-vynk-border rounded-3xl p-8 shadow-xl relative overflow-hidden">
+          <div className="bg-white/75 backdrop-blur-xl border border-border rounded-3xl p-8 shadow-xl relative overflow-hidden">
             <AnimatePresence mode="wait">
               {!requires2FA ? (
                 <motion.div key="login" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
-                  <h2 className="text-2xl font-bold text-vynk-text mb-1">Sign in</h2>
-                  <p className="text-vynk-muted text-sm mb-6">Enter your details to access your account</p>
+                  <h2 className="text-2xl font-bold text-text mb-1">Sign in</h2>
+                  <p className="text-muted text-sm mb-6">Enter your details to access your account</p>
 
                   {error && (
                     <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl mb-4 text-sm font-medium">
@@ -128,40 +128,40 @@ const Login = () => {
 
                   <form onSubmit={handleLoginSubmit} className="flex flex-col gap-4">
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-sm font-semibold text-vynk-text/70">Email</label>
-                      <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="your@email.com" className="w-full px-4 py-3 rounded-xl bg-vynk-bg-1 border border-vynk-border text-vynk-text text-sm focus:outline-none focus:ring-2 focus:ring-vynk-primary/30 focus:border-vynk-primary transition-all" required autoComplete="email" />
+                      <label className="text-sm font-semibold text-text/70">Email</label>
+                      <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="your@email.com" className="w-full px-4 py-3 rounded-xl bg-bg border border-border text-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" required autoComplete="email" />
                     </div>
 
                     <div className="flex flex-col gap-1.5">
                       <div className="flex justify-between items-center">
-                        <label className="text-sm font-semibold text-vynk-text/70">Password</label>
-                        <Link to="/forgot-password" className="text-xs text-vynk-primary hover:underline font-medium">Forgot password?</Link>
+                        <label className="text-sm font-semibold text-text/70">Password</label>
+                        <Link to="/forgot-password" className="text-xs text-primary hover:underline font-medium">Forgot password?</Link>
                       </div>
                       <div className="relative">
-                        <input type={showPass ? 'text' : 'password'} name="password" value={formData.password} onChange={handleChange} placeholder="••••••••" className="w-full px-4 py-3 pr-11 rounded-xl bg-vynk-bg-1 border border-vynk-border text-vynk-text text-sm focus:outline-none focus:ring-2 focus:ring-vynk-primary/30 focus:border-vynk-primary transition-all" required autoComplete="current-password" />
-                        <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-3.5 text-vynk-muted hover:text-vynk-text">
+                        <input type={showPass ? 'text' : 'password'} name="password" value={formData.password} onChange={handleChange} placeholder="••••••••" className="w-full px-4 py-3 pr-11 rounded-xl bg-bg border border-border text-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" required autoComplete="current-password" />
+                        <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-3.5 text-muted hover:text-text">
                           {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
                         </button>
                       </div>
                     </div>
 
-                    <button type="submit" disabled={isLoading || !formData.email || !formData.password} className="mt-4 w-full py-3.5 rounded-xl bg-vynk-text text-white font-semibold text-sm flex items-center justify-center gap-2 hover:bg-vynk-text/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+                    <button type="submit" disabled={isLoading || !formData.email || !formData.password} className="mt-4 w-full py-3.5 rounded-xl bg-text text-white font-semibold text-sm flex items-center justify-center gap-2 hover:bg-text/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
                       {isLoading ? <Loader size={18} className="animate-spin" /> : <LogIn size={18} />}
                       {isLoading ? 'Signing in...' : 'Sign In'}
                     </button>
                   </form>
 
-                  <p className="text-center text-sm text-vynk-muted mt-8">
-                    Don't have an account? <Link to="/register" className="text-vynk-primary font-semibold hover:underline">Create one</Link>
+                  <p className="text-center text-sm text-muted mt-8">
+                    Don't have an account? <Link to="/register" className="text-primary font-semibold hover:underline">Create one</Link>
                   </p>
                 </motion.div>
               ) : (
                 <motion.div key="2fa" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                  <div className="w-12 h-12 rounded-2xl bg-linear-to-tr from-vynk-secondary to-emerald-400 flex items-center justify-center mb-4 mx-auto">
+                  <div className="w-12 h-12 rounded-2xl bg-linear-to-tr from-secondary to-emerald-400 flex items-center justify-center mb-4 mx-auto">
                     <ShieldCheck size={24} className="text-white" />
                   </div>
-                  <h2 className="text-2xl font-bold text-vynk-text mb-1 text-center">Two-Step Verification</h2>
-                  <p className="text-vynk-muted text-sm mb-6 text-center">Enter the 6-digit code sent to your email</p>
+                  <h2 className="text-2xl font-bold text-text mb-1 text-center">Two-Step Verification</h2>
+                  <p className="text-muted text-sm mb-6 text-center">Enter the 6-digit code sent to your email</p>
 
                   {error && (
                     <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl mb-4 text-sm font-medium">
@@ -180,17 +180,17 @@ const Login = () => {
                           value={digit}
                           onChange={(e) => handleOtpChange(i, e.target.value)}
                           onKeyDown={(e) => handleOtpKeyDown(i, e)}
-                          className="w-12 h-14 rounded-xl bg-vynk-bg-1 border border-vynk-border text-center text-xl font-bold text-vynk-text focus:outline-none focus:ring-2 focus:ring-vynk-secondary/50 focus:border-vynk-secondary transition-all"
+                          className="w-12 h-14 rounded-xl bg-bg border border-border text-center text-xl font-bold text-text focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-secondary transition-all"
                         />
                       ))}
                     </div>
 
-                    <button type="submit" disabled={isLoading || otpCode.join('').length < 6} className="w-full py-3.5 rounded-xl bg-vynk-text text-white font-semibold text-sm flex items-center justify-center gap-2 hover:bg-vynk-text/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+                    <button type="submit" disabled={isLoading || otpCode.join('').length < 6} className="w-full py-3.5 rounded-xl bg-text text-white font-semibold text-sm flex items-center justify-center gap-2 hover:bg-text/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
                       {isLoading ? <Loader size={18} className="animate-spin" /> : <ArrowRight size={18} />}
                       Verify & Sign In
                     </button>
                     
-                    <button type="button" onClick={() => { setRequires2FA(false); setOtpCode(['','','','','','']); setError(''); }} className="text-sm font-medium text-vynk-muted hover:text-vynk-text">
+                    <button type="button" onClick={() => { setRequires2FA(false); setOtpCode(['','','','','','']); setError(''); }} className="text-sm font-medium text-muted hover:text-text">
                       Cancel
                     </button>
                   </form>

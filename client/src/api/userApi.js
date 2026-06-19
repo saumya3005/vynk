@@ -32,5 +32,9 @@ export const userApi = {
   getFollowing: async (id) => {
     const res = await api.get(`/users/${id}/following`);
     return res.data;
+  },
+  searchUsers: async (q) => {
+    const res = await api.get(`/users/search?q=${encodeURIComponent(q)}`);
+    return res.data;
   }
 };

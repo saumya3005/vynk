@@ -38,7 +38,7 @@ const MediaUploader = ({ onFileSelect, accept = "image/*,video/*", label = "Uplo
     <div 
       onClick={() => !fileDetails && inputRef.current?.click()}
       className={`w-full border-2 border-dashed rounded-2xl p-6 transition-all ${
-        fileDetails ? 'border-vynk-primary/50 bg-vynk-bg-2' : 'border-vynk-border hover:border-vynk-primary hover:bg-white/5 cursor-pointer flex flex-col items-center justify-center text-center'
+        fileDetails ? 'border-primary/50 bg-surface' : 'border-border hover:border-primary hover:bg-white/5 cursor-pointer flex flex-col items-center justify-center text-center'
       }`}
     >
       <input 
@@ -51,11 +51,11 @@ const MediaUploader = ({ onFileSelect, accept = "image/*,video/*", label = "Uplo
       
       {!fileDetails ? (
         <>
-          <div className="w-16 h-16 rounded-full bg-vynk-bg flex items-center justify-center text-vynk-muted mb-4 shadow-sm">
+          <div className="w-16 h-16 rounded-full bg-bg flex items-center justify-center text-muted mb-4 shadow-sm">
             <UploadCloud size={32} />
           </div>
-          <h4 className="font-bold text-vynk-text mb-1">{label}</h4>
-          <p className="text-sm text-vynk-muted">Click to browse files</p>
+          <h4 className="font-bold text-text mb-1">{label}</h4>
+          <p className="text-sm text-muted">Click to browse files</p>
         </>
       ) : (
         <div className="relative group">
@@ -75,11 +75,11 @@ const MediaUploader = ({ onFileSelect, accept = "image/*,video/*", label = "Uplo
               )}
             </div>
           ) : (
-            <div className="w-full py-8 flex flex-col items-center justify-center gap-3 bg-white/5 rounded-xl border border-vynk-border">
-              <FileIcon size={48} className="text-vynk-primary opacity-80" />
+            <div className="w-full py-8 flex flex-col items-center justify-center gap-3 bg-white/5 rounded-xl border border-border">
+              <FileIcon size={48} className="text-primary opacity-80" />
               <div className="text-center">
-                <p className="font-bold text-vynk-text truncate max-w-xs">{fileDetails.name}</p>
-                <p className="text-sm text-vynk-muted">{fileDetails.size}</p>
+                <p className="font-bold text-text truncate max-w-xs">{fileDetails.name}</p>
+                <p className="text-sm text-muted">{fileDetails.size}</p>
               </div>
             </div>
           )}

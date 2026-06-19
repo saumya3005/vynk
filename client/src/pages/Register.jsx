@@ -65,17 +65,17 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex bg-vynk-bg-1">
+    <div className="min-h-screen flex bg-bg">
       {/* Left Hero — hidden on mobile */}
-      <div className="hidden lg:flex flex-1 relative overflow-hidden items-center justify-center bg-vynk-text">
+      <div className="hidden lg:flex flex-1 relative overflow-hidden items-center justify-center bg-text">
         {/* Floating gradient blobs */}
-        <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-vynk-primary/30 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-vynk-accent/30 rounded-full blur-3xl animate-pulse delay-1000" />
-        <div className="absolute top-1/2 left-1/2 w-48 h-48 bg-vynk-secondary/20 rounded-full blur-3xl animate-pulse delay-500" />
+        <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-primary/30 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-accent/30 rounded-full blur-3xl animate-pulse delay-1000" />
+        <div className="absolute top-1/2 left-1/2 w-48 h-48 bg-secondary/20 rounded-full blur-3xl animate-pulse delay-500" />
 
         <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }} className="relative z-10 text-center px-12">
           <h1 className="text-6xl font-black text-white tracking-tight mb-4">
-            Vynk<span className="text-vynk-primary">.</span>
+            Vynk<span className="text-primary">.</span>
           </h1>
           <p className="text-xl text-white/60 font-light leading-relaxed max-w-md mx-auto">
             Where students, developers, and creators connect, collaborate, and build together.
@@ -95,12 +95,12 @@ const Register = () => {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="w-full max-w-lg">
           {/* Mobile brand */}
           <div className="lg:hidden text-center mb-8">
-            <h1 className="text-3xl font-black text-vynk-text">Vynk<span className="text-vynk-primary">.</span></h1>
+            <h1 className="text-3xl font-black text-text">Vynk<span className="text-primary">.</span></h1>
           </div>
 
-          <div className="bg-white/75 backdrop-blur-xl border border-vynk-border rounded-3xl p-8 shadow-xl">
-            <h2 className="text-2xl font-bold text-vynk-text mb-1">Create your account</h2>
-            <p className="text-vynk-muted text-sm mb-6">Join thousands of builders on Vynk</p>
+          <div className="bg-white/75 backdrop-blur-xl border border-border rounded-3xl p-8 shadow-xl">
+            <h2 className="text-2xl font-bold text-text mb-1">Create your account</h2>
+            <p className="text-muted text-sm mb-6">Join thousands of builders on Vynk</p>
 
             {error && (
               <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl mb-4 text-sm font-medium">
@@ -111,22 +111,22 @@ const Register = () => {
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               {/* Username */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-vynk-text/70">Username</label>
-                <input type="text" name="username" value={formData.username} onChange={handleChange} placeholder="Choose a unique username" className="w-full px-4 py-3 rounded-xl bg-vynk-bg-1 border border-vynk-border text-vynk-text text-sm focus:outline-none focus:ring-2 focus:ring-vynk-primary/30 focus:border-vynk-primary transition-all" required autoComplete="username" />
+                <label className="text-sm font-semibold text-text/70">Username</label>
+                <input type="text" name="username" value={formData.username} onChange={handleChange} placeholder="Choose a unique username" className="w-full px-4 py-3 rounded-xl bg-bg border border-border text-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" required autoComplete="username" />
               </div>
 
               {/* Email */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-vynk-text/70">Email</label>
-                <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="your@email.com" className="w-full px-4 py-3 rounded-xl bg-vynk-bg-1 border border-vynk-border text-vynk-text text-sm focus:outline-none focus:ring-2 focus:ring-vynk-primary/30 focus:border-vynk-primary transition-all" required autoComplete="email" />
+                <label className="text-sm font-semibold text-text/70">Email</label>
+                <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="your@email.com" className="w-full px-4 py-3 rounded-xl bg-bg border border-border text-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" required autoComplete="email" />
               </div>
 
               {/* Password */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-vynk-text/70">Password</label>
+                <label className="text-sm font-semibold text-text/70">Password</label>
                 <div className="relative">
-                  <input type={showPass ? 'text' : 'password'} name="password" value={formData.password} onChange={handleChange} placeholder="Create a strong password" className="w-full px-4 py-3 pr-11 rounded-xl bg-vynk-bg-1 border border-vynk-border text-vynk-text text-sm focus:outline-none focus:ring-2 focus:ring-vynk-primary/30 focus:border-vynk-primary transition-all" required autoComplete="new-password" />
-                  <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-3.5 text-vynk-muted hover:text-vynk-text">
+                  <input type={showPass ? 'text' : 'password'} name="password" value={formData.password} onChange={handleChange} placeholder="Create a strong password" className="w-full px-4 py-3 pr-11 rounded-xl bg-bg border border-border text-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" required autoComplete="new-password" />
+                  <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-3.5 text-muted hover:text-text">
                     {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
@@ -141,7 +141,7 @@ const Register = () => {
                     </div>
                     <div className="grid grid-cols-2 gap-1">
                       {passwordRules.map(r => (
-                        <div key={r.label} className={`flex items-center gap-1.5 text-xs ${r.pass ? 'text-emerald-600' : 'text-vynk-muted'}`}>
+                        <div key={r.label} className={`flex items-center gap-1.5 text-xs ${r.pass ? 'text-emerald-600' : 'text-muted'}`}>
                           {r.pass ? <Check size={12} /> : <X size={12} />}
                           {r.label}
                         </div>
@@ -154,8 +154,8 @@ const Register = () => {
 
               {/* Confirm Password */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-vynk-text/70">Confirm Password</label>
-                <input type={showPass ? 'text' : 'password'} name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="Re-enter your password" className="w-full px-4 py-3 rounded-xl bg-vynk-bg-1 border border-vynk-border text-vynk-text text-sm focus:outline-none focus:ring-2 focus:ring-vynk-primary/30 focus:border-vynk-primary transition-all" required autoComplete="new-password" />
+                <label className="text-sm font-semibold text-text/70">Confirm Password</label>
+                <input type={showPass ? 'text' : 'password'} name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="Re-enter your password" className="w-full px-4 py-3 rounded-xl bg-bg border border-border text-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" required autoComplete="new-password" />
                 {formData.confirmPassword && formData.password !== formData.confirmPassword && (
                   <p className="text-xs text-red-500 mt-1">Passwords do not match</p>
                 )}
@@ -163,31 +163,31 @@ const Register = () => {
 
               {/* Role Selection Cards */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-vynk-text/70">I am a...</label>
+                <label className="text-sm font-semibold text-text/70">I am a...</label>
                 <div className="grid grid-cols-3 gap-2">
                   {ROLES.map(r => {
                     const Icon = r.icon;
                     const selected = formData.role === r.value;
                     return (
-                      <button key={r.value} type="button" onClick={() => setFormData(p => ({ ...p, role: r.value }))} className={`flex flex-col items-center gap-1 p-3 rounded-xl border-2 transition-all text-center ${selected ? 'border-vynk-primary bg-vynk-primary/5 shadow-sm' : 'border-vynk-border hover:border-vynk-primary/30 bg-white/50'}`}>
+                      <button key={r.value} type="button" onClick={() => setFormData(p => ({ ...p, role: r.value }))} className={`flex flex-col items-center gap-1 p-3 rounded-xl border-2 transition-all text-center ${selected ? 'border-primary bg-primary/5 shadow-sm' : 'border-border hover:border-primary/30 bg-white/50'}`}>
                         <div className={`w-8 h-8 rounded-lg bg-linear-to-tr ${r.color} flex items-center justify-center`}>
                           <Icon size={16} className="text-white" />
                         </div>
-                        <span className={`text-xs font-semibold ${selected ? 'text-vynk-primary' : 'text-vynk-muted'}`}>{r.label}</span>
+                        <span className={`text-xs font-semibold ${selected ? 'text-primary' : 'text-muted'}`}>{r.label}</span>
                       </button>
                     );
                   })}
                 </div>
               </div>
 
-              <button type="submit" disabled={isLoading || !allValid} className="mt-2 w-full py-3.5 rounded-xl bg-vynk-text text-white font-semibold text-sm flex items-center justify-center gap-2 hover:bg-vynk-text/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+              <button type="submit" disabled={isLoading || !allValid} className="mt-2 w-full py-3.5 rounded-xl bg-text text-white font-semibold text-sm flex items-center justify-center gap-2 hover:bg-text/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
                 {isLoading ? <Loader size={18} className="animate-spin" /> : <UserPlus size={18} />}
                 {isLoading ? 'Creating account...' : 'Create Account'}
               </button>
             </form>
 
-            <p className="text-center text-sm text-vynk-muted mt-6">
-              Already have an account? <Link to="/login" className="text-vynk-primary font-semibold hover:underline">Sign in</Link>
+            <p className="text-center text-sm text-muted mt-6">
+              Already have an account? <Link to="/login" className="text-primary font-semibold hover:underline">Sign in</Link>
             </p>
           </div>
         </motion.div>

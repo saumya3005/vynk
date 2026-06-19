@@ -35,28 +35,28 @@ const CommunityCard = ({ comm }) => {
       animate={{ opacity: 1, y: 0 }}
       className="glass-card overflow-hidden flex flex-col h-full"
     >
-      <div className={`h-24 w-full bg-linear-to-tr from-vynk-primary to-vynk-secondary relative`}>
+      <div className={`h-24 w-full bg-linear-to-tr from-primary to-secondary relative`}>
         {comm.banner && <img src={comm.banner} className="w-full h-full object-cover opacity-60 mix-blend-overlay" />}
-        <div className="absolute -bottom-6 left-6 w-12 h-12 rounded-xl bg-white shadow-lg flex items-center justify-center text-vynk-text">
+        <div className="absolute -bottom-6 left-6 w-12 h-12 rounded-xl bg-white shadow-lg flex items-center justify-center text-text">
           <Hash size={24} />
         </div>
       </div>
       
       <div className="p-6 pt-10 flex-1 flex flex-col">
-        <h3 className="text-xl font-bold text-vynk-text mb-2 line-clamp-1">{comm.name}</h3>
-        <p className="text-sm font-bold text-vynk-primary mb-3">{comm.category || 'General'}</p>
-        <p className="text-sm text-vynk-muted mb-6 flex-1 line-clamp-3">{comm.description}</p>
+        <h3 className="text-xl font-bold text-text mb-2 line-clamp-1">{comm.name}</h3>
+        <p className="text-sm font-bold text-primary mb-3">{comm.category || 'General'}</p>
+        <p className="text-sm text-muted mb-6 flex-1 line-clamp-3">{comm.description}</p>
         
-        <div className="flex items-center justify-between pt-4 border-t border-vynk-border">
-          <div className="flex items-center gap-2 text-xs font-bold text-vynk-text/70">
+        <div className="flex items-center justify-between pt-4 border-t border-border">
+          <div className="flex items-center gap-2 text-xs font-bold text-text/70">
             <Users size={16} /> {memberCount} Members
           </div>
           <button 
             onClick={handleJoin}
             className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
               isJoined 
-                ? 'bg-vynk-bg-2 border border-vynk-border text-vynk-muted hover:text-red-500 hover:border-red-500' 
-                : 'bg-vynk-text text-white hover:bg-vynk-primary'
+                ? 'bg-surface border border-border text-muted hover:text-red-500 hover:border-red-500' 
+                : 'bg-text text-white hover:bg-primary'
             }`}
           >
             {isJoined ? 'Joined' : 'Join'}
@@ -93,8 +93,8 @@ const Communities = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
         <div>
-          <h1 className="text-4xl font-extrabold text-vynk-text mb-2">Communities</h1>
-          <p className="text-vynk-muted font-medium max-w-xl">Join micro-ecosystems, find your tribe, participate in discussions, and attend virtual events.</p>
+          <h1 className="text-4xl font-extrabold text-text mb-2">Communities</h1>
+          <p className="text-muted font-medium max-w-xl">Join micro-ecosystems, find your tribe, participate in discussions, and attend virtual events.</p>
         </div>
         <button onClick={() => setShowCreateModal(true)} className="btn-primary shrink-0">
           <Plus size={20} /> Create Community
@@ -104,10 +104,10 @@ const Communities = () => {
       {/* Grid */}
       {isLoading ? (
         <div className="flex justify-center items-center h-64">
-          <div className="w-10 h-10 border-4 border-vynk-primary border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
         </div>
       ) : communities.length === 0 ? (
-        <div className="text-center py-20 text-vynk-muted">
+        <div className="text-center py-20 text-muted">
           <p className="text-xl font-bold">No communities yet</p>
           <p className="text-sm">Be the first to create one!</p>
         </div>

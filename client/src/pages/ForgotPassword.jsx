@@ -31,41 +31,41 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-vynk-bg via-vynk-bg-2 to-vynk-bg px-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-bg via-bg-2 to-bg px-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md"
       >
         <div className="glass-card p-8">
-          <Link to="/login" className="flex items-center gap-2 text-vynk-muted hover:text-vynk-text mb-6 text-sm font-medium transition-colors">
+          <Link to="/login" className="flex items-center gap-2 text-muted hover:text-text mb-6 text-sm font-medium transition-colors">
             <ArrowLeft size={16} /> Back to Login
           </Link>
 
-          <div className="w-12 h-12 rounded-2xl bg-linear-to-tr from-vynk-primary to-vynk-secondary flex items-center justify-center mb-4">
+          <div className="w-12 h-12 rounded-2xl bg-linear-to-tr from-primary to-secondary flex items-center justify-center mb-4">
             <Mail size={24} className="text-white" />
           </div>
 
-          <h1 className="text-2xl font-bold text-vynk-text mb-2">Forgot Password</h1>
-          <p className="text-vynk-muted text-sm mb-6">Enter your email and we'll generate a reset link.</p>
+          <h1 className="text-2xl font-bold text-text mb-2">Forgot Password</h1>
+          <p className="text-muted text-sm mb-6">Enter your email and we'll generate a reset link.</p>
 
           {result ? (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <CheckCircle size={32} className="text-green-600" />
               </div>
-              <p className="font-bold text-vynk-text mb-2">Reset Link Generated</p>
-              <p className="text-sm text-vynk-muted mb-4">{result.message}</p>
+              <p className="font-bold text-text mb-2">Reset Link Generated</p>
+              <p className="text-sm text-muted mb-4">{result.message}</p>
 
               {result.resetUrl && (
-                <div className="bg-vynk-bg-2 rounded-xl p-4 text-left mb-4">
-                  <p className="text-xs font-bold text-vynk-muted uppercase mb-2">Dev Reset URL</p>
-                  <p className="text-xs text-vynk-text break-all mb-3">{result.resetUrl}</p>
+                <div className="bg-surface rounded-xl p-4 text-left mb-4">
+                  <p className="text-xs font-bold text-muted uppercase mb-2">Dev Reset URL</p>
+                  <p className="text-xs text-text break-all mb-3">{result.resetUrl}</p>
                   <div className="flex gap-2">
-                    <button onClick={copyLink} className="flex items-center gap-1 text-xs text-vynk-primary font-semibold hover:underline">
+                    <button onClick={copyLink} className="flex items-center gap-1 text-xs text-primary font-semibold hover:underline">
                       <Copy size={12} /> Copy
                     </button>
-                    <a href={result.resetUrl} className="flex items-center gap-1 text-xs text-vynk-secondary font-semibold hover:underline">
+                    <a href={result.resetUrl} className="flex items-center gap-1 text-xs text-secondary font-semibold hover:underline">
                       <ExternalLink size={12} /> Open
                     </a>
                   </div>
@@ -77,7 +77,7 @@ const ForgotPassword = () => {
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <div>
-                <label className="text-sm font-medium text-vynk-text mb-1 block">Email Address</label>
+                <label className="text-sm font-medium text-text mb-1 block">Email Address</label>
                 <input
                   type="email"
                   required

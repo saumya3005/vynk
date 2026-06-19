@@ -34,17 +34,17 @@ const ProjectCard = ({ project, onUpdate }) => {
       className="glass-card overflow-hidden group cursor-pointer flex flex-col h-full"
     >
       {/* Cover Image */}
-      <div className="relative h-48 w-full overflow-hidden bg-vynk-bg-2">
+      <div className="relative h-48 w-full overflow-hidden bg-surface">
         {project.images?.[0] ? (
           <img src={project.images[0]} alt={project.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-linear-to-tr from-vynk-primary to-vynk-secondary text-white font-bold text-xl">
+          <div className="w-full h-full flex items-center justify-center bg-linear-to-tr from-primary to-secondary text-white font-bold text-xl">
             {project.title}
           </div>
         )}
         
         {project.collaborationOpen && (
-          <div className="absolute top-4 right-4 bg-vynk-accent/90 backdrop-blur-sm text-green-800 text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+          <div className="absolute top-4 right-4 bg-accent/90 backdrop-blur-sm text-green-800 text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
             Collab Open
           </div>
         )}
@@ -62,27 +62,27 @@ const ProjectCard = ({ project, onUpdate }) => {
 
       {/* Content */}
       <div className="p-5 flex flex-col flex-1">
-        <h3 className="text-lg font-bold text-vynk-text group-hover:text-vynk-primary transition-colors mb-2 line-clamp-1">{project.title}</h3>
-        <p className="text-sm text-vynk-muted line-clamp-2 mb-4 flex-1">{project.description}</p>
+        <h3 className="text-lg font-bold text-text group-hover:text-primary transition-colors mb-2 line-clamp-1">{project.title}</h3>
+        <p className="text-sm text-muted line-clamp-2 mb-4 flex-1">{project.description}</p>
         
         <div className="flex flex-wrap gap-2 mb-4">
           {project.techStack?.map(tag => (
-            <span key={tag} className="text-[10px] font-bold uppercase tracking-wider bg-vynk-bg-2 border border-vynk-border px-2 py-1 rounded-md text-vynk-text/70">
+            <span key={tag} className="text-[10px] font-bold uppercase tracking-wider bg-surface border border-border px-2 py-1 rounded-md text-text/70">
               {tag}
             </span>
           ))}
         </div>
 
-        <div className="flex items-center justify-between pt-4 border-t border-vynk-border/50">
+        <div className="flex items-center justify-between pt-4 border-t border-border/50">
           <div className="flex items-center gap-2">
-            <img src={project.owner?.avatar || 'https://via.placeholder.com/40'} alt="Owner" className="w-6 h-6 rounded-full object-cover border border-vynk-border" />
-            <span className="text-xs font-bold text-vynk-text">{project.owner?.username}</span>
+            <img src={project.owner?.avatar || 'https://via.placeholder.com/40'} alt="Owner" className="w-6 h-6 rounded-full object-cover border border-border" />
+            <span className="text-xs font-bold text-text">{project.owner?.username}</span>
           </div>
           
-          <div className="flex items-center gap-3 text-xs font-semibold text-vynk-muted">
+          <div className="flex items-center gap-3 text-xs font-semibold text-muted">
             <span className="flex items-center gap-1"><Eye size={14} /> {project.views || 0}</span>
-            <button onClick={handleLike} className="flex items-center gap-1 group-hover:text-vynk-primary transition-colors hover:text-vynk-primary">
-              <Heart size={14} className={isLiked ? 'fill-vynk-primary text-vynk-primary' : ''} /> {likesCount}
+            <button onClick={handleLike} className="flex items-center gap-1 group-hover:text-primary transition-colors hover:text-primary">
+              <Heart size={14} className={isLiked ? 'fill-primary text-primary' : ''} /> {likesCount}
             </button>
           </div>
         </div>
@@ -93,6 +93,7 @@ const ProjectCard = ({ project, onUpdate }) => {
 
 const Projects = () => {
   const [activeTab, setActiveTab] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
   const [projects, setProjects] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -112,19 +113,28 @@ const Projects = () => {
     }
   };
 
-  const filteredProjects = activeTab === 'All' 
-    ? projects 
-    : projects.filter(p => activeTab === 'Open for Collab' ? p.collaborationOpen : p.category === activeTab);
+  const filteredProjects = projects.filter(p => {
+    const matchesTab = activeTab === 'All' 
+      ? true 
+      : activeTab === 'Open for Collab' 
+        ? p.collaborationOpen 
+        : p.category === activeTab;
+    
+    const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          p.description.toLowerCase().includes(searchQuery.toLowerCase());
+
+    return matchesTab && matchesSearch;
+  });
 
   return (
     <div className="p-4 md:p-8 max-w-7xl mx-auto pb-24 md:pb-8">
       {/* Header Banner */}
-      <div className="w-full bg-linear-to-tr from-vynk-primary to-vynk-secondary rounded-3xl p-8 md:p-12 text-white mb-10 shadow-xl shadow-vynk-primary/20 relative overflow-hidden">
+      <div className="w-full bg-linear-to-tr from-primary to-secondary rounded-3xl p-8 md:p-12 text-white mb-10 shadow-xl shadow-primary/20 relative overflow-hidden">
         <div className="absolute inset-0 bg-white/10 backdrop-blur-3xl mix-blend-overlay"></div>
         <div className="relative z-10 max-w-2xl">
           <h1 className="text-4xl md:text-5xl font-extrabold mb-4 drop-shadow-md">Project Showcase</h1>
           <p className="text-lg md:text-xl text-white/90 mb-8 font-medium">Discover top tier projects built by the Vynk community, find collaborators, and showcase your own startup or portfolio pieces.</p>
-          <Link to="/projects/create" className="btn-secondary text-vynk-primary px-6 py-3 bg-white hover:bg-white hover:-translate-y-1">
+          <Link to="/projects/create" className="btn-secondary text-primary px-6 py-3 bg-white hover:bg-white hover:-translate-y-1">
             <Plus size={20} /> Publish Project
           </Link>
         </div>
@@ -139,7 +149,7 @@ const Projects = () => {
               key={tab} 
               onClick={() => setActiveTab(tab)}
               className={`whitespace-nowrap px-4 py-2 rounded-xl text-sm font-bold transition-all ${
-                activeTab === tab ? 'bg-vynk-text text-white shadow-md' : 'bg-white border border-vynk-border text-vynk-muted hover:text-vynk-text'
+                activeTab === tab ? 'bg-text text-white shadow-md' : 'bg-white border border-border text-muted hover:text-text'
               }`}
             >
               {tab}
@@ -149,10 +159,16 @@ const Projects = () => {
 
         <div className="flex gap-3 w-full md:w-auto">
           <div className="relative flex-1 md:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-vynk-muted" size={18} />
-            <input type="text" placeholder="Search projects..." className="glass-input w-full pl-10" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
+            <input 
+              type="text" 
+              placeholder="Search projects..." 
+              className="glass-input w-full pl-10" 
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+            />
           </div>
-          <button className="glass-input px-4 flex items-center justify-center text-vynk-muted hover:text-vynk-text shrink-0">
+          <button className="glass-input px-4 flex items-center justify-center text-muted hover:text-text shrink-0">
             <Filter size={18} />
           </button>
         </div>
@@ -161,12 +177,12 @@ const Projects = () => {
       {/* Grid */}
       {isLoading ? (
         <div className="flex justify-center items-center h-64">
-          <div className="w-10 h-10 border-4 border-vynk-primary border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
         </div>
       ) : filteredProjects.length === 0 ? (
-        <div className="text-center py-20 text-vynk-muted">
+        <div className="text-center py-20 text-muted">
           <p className="text-xl font-bold">No projects found</p>
-          <p className="text-sm">Be the first to publish a project in this category!</p>
+          <p className="text-sm">Try a different search or category.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">

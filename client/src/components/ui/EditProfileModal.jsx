@@ -60,9 +60,9 @@ const EditProfileModal = ({ profileData, onClose, onSave }) => {
         animate={{ opacity: 1, scale: 1 }}
         className="glass-card w-full max-w-2xl max-h-[90vh] flex flex-col bg-white overflow-hidden"
       >
-        <div className="flex justify-between items-center p-6 border-b border-vynk-border">
-          <h2 className="text-xl font-bold text-vynk-text">Edit Profile</h2>
-          <button onClick={onClose} className="p-2 hover:bg-vynk-bg-2 rounded-full text-vynk-muted hover:text-vynk-text transition-colors">
+        <div className="flex justify-between items-center p-6 border-b border-border">
+          <h2 className="text-xl font-bold text-text">Edit Profile</h2>
+          <button onClick={onClose} className="p-2 hover:bg-surface rounded-full text-muted hover:text-text transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -72,12 +72,12 @@ const EditProfileModal = ({ profileData, onClose, onSave }) => {
             {/* Basic Info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-semibold text-vynk-text/80">Username</label>
-                <input type="text" name="username" value={formData.username} onChange={handleChange} className="glass-input bg-vynk-bg-2" required />
+                <label className="text-sm font-semibold text-text/80">Username</label>
+                <input type="text" name="username" value={formData.username} onChange={handleChange} className="glass-input bg-surface" required />
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-semibold text-vynk-text/80">Role</label>
-                <select name="role" value={formData.role} onChange={handleChange} className="glass-input bg-vynk-bg-2">
+                <label className="text-sm font-semibold text-text/80">Role</label>
+                <select name="role" value={formData.role} onChange={handleChange} className="glass-input bg-surface">
                   <option value="Student">Student</option>
                   <option value="Developer">Developer</option>
                   <option value="Recruiter">Recruiter</option>
@@ -89,51 +89,51 @@ const EditProfileModal = ({ profileData, onClose, onSave }) => {
             </div>
 
             <div className="flex flex-col gap-1">
-              <label className="text-sm font-semibold text-vynk-text/80">Bio</label>
-              <textarea name="bio" value={formData.bio} onChange={handleChange} rows={3} className="glass-input bg-vynk-bg-2 resize-none" placeholder="Tell us about yourself..." />
+              <label className="text-sm font-semibold text-text/80">Bio</label>
+              <textarea name="bio" value={formData.bio} onChange={handleChange} rows={3} className="glass-input bg-surface resize-none" placeholder="Tell us about yourself..." />
             </div>
 
             <div className="flex flex-col gap-1">
-              <label className="text-sm font-semibold text-vynk-text/80">Location</label>
-              <input type="text" name="location" value={formData.location} onChange={handleChange} className="glass-input bg-vynk-bg-2" placeholder="City, Country" />
+              <label className="text-sm font-semibold text-text/80">Location</label>
+              <input type="text" name="location" value={formData.location} onChange={handleChange} className="glass-input bg-surface" placeholder="City, Country" />
             </div>
 
             {/* Links */}
-            <h3 className="font-bold text-vynk-text mt-4">Social Links</h3>
+            <h3 className="font-bold text-text mt-4">Social Links</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-semibold text-vynk-text/80">GitHub URL</label>
-                <input type="url" name="github" value={formData.github} onChange={handleChange} className="glass-input bg-vynk-bg-2" placeholder="https://github.com/..." />
+                <label className="text-sm font-semibold text-text/80">GitHub URL</label>
+                <input type="url" name="github" value={formData.github} onChange={handleChange} className="glass-input bg-surface" placeholder="https://github.com/..." />
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-semibold text-vynk-text/80">LinkedIn URL</label>
-                <input type="url" name="linkedin" value={formData.linkedin} onChange={handleChange} className="glass-input bg-vynk-bg-2" placeholder="https://linkedin.com/in/..." />
+                <label className="text-sm font-semibold text-text/80">LinkedIn URL</label>
+                <input type="url" name="linkedin" value={formData.linkedin} onChange={handleChange} className="glass-input bg-surface" placeholder="https://linkedin.com/in/..." />
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-semibold text-vynk-text/80">Portfolio URL</label>
-                <input type="url" name="portfolio" value={formData.portfolio} onChange={handleChange} className="glass-input bg-vynk-bg-2" placeholder="https://..." />
+                <label className="text-sm font-semibold text-text/80">Portfolio URL</label>
+                <input type="url" name="portfolio" value={formData.portfolio} onChange={handleChange} className="glass-input bg-surface" placeholder="https://..." />
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-semibold text-vynk-text/80">Resume URL</label>
-                <input type="url" name="resume" value={formData.resume} onChange={handleChange} className="glass-input bg-vynk-bg-2" placeholder="https://..." />
+                <label className="text-sm font-semibold text-text/80">Resume URL</label>
+                <input type="url" name="resume" value={formData.resume} onChange={handleChange} className="glass-input bg-surface" placeholder="https://..." />
               </div>
             </div>
 
             {/* Media */}
-            <h3 className="font-bold text-vynk-text mt-4">Media URLs</h3>
+            <h3 className="font-bold text-text mt-4">Media URLs</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-semibold text-vynk-text/80">Avatar URL</label>
-                <input type="url" name="avatar" value={formData.avatar} onChange={handleChange} className="glass-input bg-vynk-bg-2" placeholder="https://..." />
+                <label className="text-sm font-semibold text-text/80">Avatar URL</label>
+                <input type="url" name="avatar" value={formData.avatar} onChange={handleChange} className="glass-input bg-surface" placeholder="https://..." />
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-semibold text-vynk-text/80">Cover Image URL</label>
-                <input type="url" name="coverImage" value={formData.coverImage} onChange={handleChange} className="glass-input bg-vynk-bg-2" placeholder="https://..." />
+                <label className="text-sm font-semibold text-text/80">Cover Image URL</label>
+                <input type="url" name="coverImage" value={formData.coverImage} onChange={handleChange} className="glass-input bg-surface" placeholder="https://..." />
               </div>
             </div>
 
             {/* Skills */}
-            <h3 className="font-bold text-vynk-text mt-4">Skills</h3>
+            <h3 className="font-bold text-text mt-4">Skills</h3>
             <div className="flex flex-col gap-3">
               <div className="flex gap-2">
                 <input 
@@ -141,14 +141,14 @@ const EditProfileModal = ({ profileData, onClose, onSave }) => {
                   value={newSkill} 
                   onChange={e => setNewSkill(e.target.value)} 
                   onKeyPress={e => e.key === 'Enter' && (e.preventDefault(), handleAddSkill())}
-                  className="glass-input bg-vynk-bg-2 flex-1" 
+                  className="glass-input bg-surface flex-1" 
                   placeholder="Add a skill (e.g. React)" 
                 />
                 <button type="button" onClick={handleAddSkill} className="btn-secondary px-4"><Plus size={18} /></button>
               </div>
               <div className="flex flex-wrap gap-2">
                 {skills.map(skill => (
-                  <span key={skill} className="flex items-center gap-1 px-3 py-1 bg-white border border-vynk-border rounded-lg text-xs font-bold shadow-sm">
+                  <span key={skill} className="flex items-center gap-1 px-3 py-1 bg-white border border-border rounded-lg text-xs font-bold shadow-sm">
                     {skill}
                     <button type="button" onClick={() => handleRemoveSkill(skill)} className="text-red-500 hover:text-red-700 ml-1"><Trash2 size={12} /></button>
                   </span>
@@ -158,7 +158,7 @@ const EditProfileModal = ({ profileData, onClose, onSave }) => {
           </form>
         </div>
 
-        <div className="p-6 border-t border-vynk-border flex justify-end gap-3 bg-vynk-bg-1">
+        <div className="p-6 border-t border-border flex justify-end gap-3 bg-bg">
           <button onClick={onClose} disabled={isLoading} className="btn-secondary">Cancel</button>
           <button type="submit" form="edit-profile-form" disabled={isLoading} className="btn-primary flex items-center gap-2">
             <Save size={18} /> {isLoading ? 'Saving...' : 'Save Changes'}

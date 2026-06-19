@@ -157,7 +157,7 @@ const CallModal = ({ socket, user, callee, callType, incomingCall, onClose }) =>
               <X size={18} />
             </button>
 
-            <div className="w-20 h-20 rounded-full overflow-hidden mx-auto mb-3 bg-vynk-primary/30 border-2 border-vynk-primary">
+            <div className="w-20 h-20 rounded-full overflow-hidden mx-auto mb-3 bg-primary/30 border-2 border-primary">
               {otherUser?.avatar
                 ? <img src={otherUser.avatar} alt="" className="w-full h-full object-cover" />
                 : <div className="w-full h-full flex items-center justify-center text-white text-2xl font-bold">{otherUser?.username?.[0]?.toUpperCase()}</div>
