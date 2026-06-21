@@ -132,7 +132,7 @@ const LandingPage = () => {
               title="Social Feed & Reels" 
               subtitle="Share your journey with photos, videos, and short-form reels."
               icon={PlayCircle}
-              className="md:col-span-2 bg-gradient-to-br from-surface to-surface-soft"
+              className="md:col-span-2 bg-linear-to-br from-surface to-surface-soft"
               delay={0.1}
             >
               <div className="flex gap-4">
@@ -147,7 +147,7 @@ const LandingPage = () => {
               title="Real-time Chat" 
               subtitle="Connect instantly with voice, video, and text."
               icon={MessageSquare}
-              className="bg-gradient-to-br from-surface to-surface-soft"
+              className="bg-linear-to-br from-surface to-surface-soft"
               delay={0.2}
             >
               <div className="flex flex-col gap-3">
@@ -161,7 +161,7 @@ const LandingPage = () => {
               title="Project Collaboration" 
               subtitle="Showcase your GitHub repos and find teammates."
               icon={Code}
-              className="bg-gradient-to-br from-surface to-surface-soft"
+              className="bg-linear-to-br from-surface to-surface-soft"
               delay={0.3}
             >
               <div className="flex flex-wrap gap-2">
@@ -176,7 +176,7 @@ const LandingPage = () => {
               title="Student Hub" 
               subtitle="Access and share verified college notes and resources."
               icon={BookOpen}
-              className="md:col-span-2 bg-gradient-to-br from-surface to-surface-soft"
+              className="md:col-span-2 bg-linear-to-br from-surface to-surface-soft"
               delay={0.4}
             >
               <div className="flex items-center gap-4 bg-white/40 p-4 rounded-xl border border-border w-max">
@@ -209,7 +209,7 @@ const LandingPage = () => {
 
         {/* Bottom CTA */}
         <div className="mt-40 text-center">
-          <div className="glass-card p-12 max-w-3xl mx-auto bg-gradient-to-tr from-surface to-primary/5">
+          <div className="glass-card p-12 max-w-3xl mx-auto bg-linear-to-tr from-surface to-primary/5">
             <h2 className="text-4xl font-bold text-ink mb-6">Ready to join the future?</h2>
             <p className="text-xl text-muted mb-8">Stop jumping between apps. Everything you need is right here.</p>
             <Link to="/register" className="btn-primary text-xl px-10 py-5">

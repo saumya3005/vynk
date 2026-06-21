@@ -224,7 +224,7 @@ const Explore = () => {
         </div>
 
         {/* Sidebar */}
-        <div className="flex flex-col gap-6 hidden md:flex">
+        <div className="hidden md:flex flex-col gap-6">
           <div className="glass-card p-6 sticky top-24">
             <h3 className="font-bold flex items-center gap-2 mb-4 text-text"><Users size={18} className="text-primary" /> Suggested Users</h3>
             {isLoading ? (
@@ -240,8 +240,8 @@ const Explore = () => {
                          {u.avatar ? <img src={u.avatar} alt="" className="w-full h-full object-cover"/> : <div className="w-full h-full flex items-center justify-center font-bold text-xs text-primary">{u.username?.[0]?.toUpperCase()}</div>}
                       </div>
                       <div className="overflow-hidden">
-                        <p className="text-sm font-bold leading-tight truncate max-w-[100px]">{u.username}</p>
-                        <p className="text-xs text-muted truncate max-w-[100px]">{u.role || 'Member'}</p>
+                        <p className="text-sm font-bold leading-tight truncate max-w-25">{u.username}</p>
+                        <p className="text-xs text-muted truncate max-w-25">{u.role || 'Member'}</p>
                       </div>
                     </div>
                     <button className="text-xs font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-full hover:bg-primary hover:text-white transition-colors" onClick={(e) => { e.stopPropagation(); navigate(`/profile/${u._id}`); }}>View</button>

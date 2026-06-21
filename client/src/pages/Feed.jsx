@@ -12,7 +12,7 @@ import StoryCreatorModal from '../components/ui/StoryCreatorModal';
 
 const StoryRing = ({ story, onClick }) => (
   <div onClick={onClick} className="flex flex-col items-center gap-1 cursor-pointer group shrink-0">
-    <div className={`w-16 h-16 rounded-full p-[3px] bg-linear-to-tr ${story.viewers?.includes('current_user_id') ? 'from-border to-border' : 'from-primary via-secondary to-accent'} relative group-hover:scale-105 transition-transform duration-200`}>
+    <div className={`w-16 h-16 rounded-full p-0.75 bg-linear-to-tr ${story.viewers?.includes('current_user_id') ? 'from-border to-border' : 'from-primary via-secondary to-accent'} relative group-hover:scale-105 transition-transform duration-200`}>
       <div className="w-full h-full rounded-full border-2 border-bg overflow-hidden bg-white">
         <img src={story.author?.avatar || 'https://via.placeholder.com/150'} alt={story.author?.username} className="w-full h-full object-cover" />
       </div>
@@ -223,7 +223,7 @@ const FeedComposer = ({ onPostCreated }) => {
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="What's on your mind? Share a project, thought, or note..."
-            className="w-full bg-transparent border-none resize-none focus:ring-0 text-text text-lg placeholder:text-muted pt-2 min-h-[60px]"
+            className="w-full bg-transparent border-none resize-none focus:ring-0 text-text text-lg placeholder:text-muted pt-2 min-h-15"
           />
           {mediaUrl && (
             <div className="relative mt-2 rounded-xl overflow-hidden border border-border inline-block max-w-xs">
@@ -353,7 +353,7 @@ const Feed = () => {
           >
             {tab}
             {activeTab === tab && (
-              <motion.div layoutId="feed-tab" className="absolute bottom-0 left-0 w-full h-[2px] bg-text rounded-t-full" />
+              <motion.div layoutId="feed-tab" className="absolute bottom-0 left-0 w-full h-0.5 bg-text rounded-t-full" />
             )}
           </button>
         ))}

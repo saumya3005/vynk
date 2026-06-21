@@ -154,7 +154,7 @@ const Stories = () => {
         {/* Progress Bar */}
         <div className="absolute top-2 left-2 right-2 flex gap-1 z-30">
           {stories.map((_, idx) => (
-            <div key={idx} className="h-[3px] flex-1 bg-white/30 rounded-full overflow-hidden">
+            <div key={idx} className="h-0.75 flex-1 bg-white/30 rounded-full overflow-hidden">
               <motion.div 
                 className="h-full bg-white"
                 style={{ width: idx < currentIndex ? '100%' : idx === currentIndex ? `${progress}%` : '0%' }}
@@ -204,7 +204,7 @@ const Stories = () => {
         </div>
 
         {/* Footer */}
-        <div className="absolute bottom-0 left-0 w-full p-4 z-30 bg-gradient-to-t from-black/80 to-transparent">
+        <div className="absolute bottom-0 left-0 w-full p-4 z-30 bg-linear-to-t from-black/80 to-transparent">
           {isMyStory ? (
             <div className="flex justify-between items-center text-white">
               <div className="flex items-center gap-2">

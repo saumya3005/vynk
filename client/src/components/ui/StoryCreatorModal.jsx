@@ -132,7 +132,7 @@ const StoryCreatorModal = ({ isOpen, onClose, onUpload }) => {
 
           {/* Footer Area */}
           {mediaPreview && (
-            <div className="absolute bottom-0 left-0 w-full p-4 flex justify-between items-center bg-gradient-to-t from-black/80 to-transparent z-40">
+            <div className="absolute bottom-0 left-0 w-full p-4 flex justify-between items-center bg-linear-to-t from-black/80 to-transparent z-40">
               <div className="flex bg-black/40 rounded-full p-1 backdrop-blur-md border border-white/10">
                 {['Everyone', 'Close Friends'].map(p => (
                   <button key={p} onClick={() => setPrivacy(p)} className={`px-4 py-1.5 rounded-full text-xs font-bold transition-colors ${privacy === p ? 'bg-white text-black' : 'text-white hover:bg-white/20'}`}>
