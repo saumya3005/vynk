@@ -36,5 +36,9 @@ export const postApi = {
   deleteComment: async (postId, commentId) => {
     const res = await api.delete(`/posts/${postId}/comments/${commentId}`);
     return res.data;
+  },
+  votePoll: async (postId, optionIndex) => {
+    const res = await api.put(`/posts/${postId}/vote`, { optionIndex });
+    return res.data;
   }
 };

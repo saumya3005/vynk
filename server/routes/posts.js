@@ -8,8 +8,8 @@ const cloudinary = require('../config/cloudinary');
 // Create post
 router.post('/', auth, async (req, res) => {
   try {
-    if (!req.body.content && !req.body.mediaUrl) {
-      return res.status(400).json({ success: false, message: 'Post must have content or media' });
+    if (!req.body.content && !req.body.mediaUrl && !req.body.pollOptions && !req.body.codeBlock) {
+      return res.status(400).json({ success: false, message: 'Post must have content, media, code, or poll options' });
     }
     const newPost = new Post({
       content: req.body.content || '',
@@ -17,7 +17,11 @@ router.post('/', auth, async (req, res) => {
       mediaType: req.body.mediaType || 'text',
       category: req.body.category || 'General',
       tags: req.body.tags || [],
-      author: req.user.id
+      author: req.user.id,
+      postType: req.body.postType || 'text',
+      pollOptions: req.body.pollOptions || [],
+      codeBlock: req.body.codeBlock || undefined,
+      carouselMedia: req.body.carouselMedia || []
     });
     const savedPost = await newPost.save();
     const populated = await savedPost.populate('author', 'username avatar role');
@@ -25,6 +29,35 @@ router.post('/', auth, async (req, res) => {
   } catch (err) {
     console.error('Create post error:', err.message);
     res.status(500).json({ success: false, message: err.message || 'Server error' });
+  }
+});
+
+// Vote in poll
+router.put('/:id/vote', auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) return res.status(404).json({ message: 'Post not found' });
+    
+    const { optionIndex } = req.body;
+    if (optionIndex === undefined || optionIndex < 0 || optionIndex >= post.pollOptions.length) {
+      return res.status(400).json({ message: 'Invalid option index' });
+    }
+
+    // Remove user vote from all options of this poll
+    post.pollOptions.forEach(opt => {
+      opt.votes = opt.votes.filter(v => v.toString() !== req.user.id);
+    });
+
+    // Add user vote to the selected option
+    post.pollOptions[optionIndex].votes.push(req.user.id);
+
+    await post.save();
+    const populated = await Post.findById(req.params.id)
+      .populate('author', 'username avatar role')
+      .populate('comments.author', 'username avatar');
+    res.json(populated);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
@@ -72,7 +105,7 @@ router.put('/:id/like', auth, async (req, res) => {
           user: post.author,
           type: 'like',
           message: `${user.username} liked your post.`,
-          link: `/profile/${post.author}` // or link to post
+          link: `/profile/${post.author}`
         });
       }
     } else {

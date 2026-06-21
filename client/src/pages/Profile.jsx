@@ -182,7 +182,7 @@ const Profile = () => {
                   </div>
                 )}
               </div>
-              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-text text-white text-xs font-bold px-3 py-1 rounded-full border-2 border-bg-1 shadow-md whitespace-nowrap flex items-center gap-1">
+              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-ink text-white text-xs font-bold px-3 py-1 rounded-full border-2 border-bg-1 shadow-md whitespace-nowrap flex items-center gap-1">
                 <Zap size={12} className="text-yellow-400 fill-yellow-400" /> Level {stats.level}
               </div>
             </div>
@@ -289,7 +289,7 @@ const Profile = () => {
                 >
                   {tab}
                   {activeTab === tab && (
-                    <motion.div layoutId="profile-tab" className="absolute bottom-0 left-0 w-full h-0.5 bg-text rounded-t-full" />
+                    <motion.div layoutId="profile-tab" className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full" />
                   )}
                 </button>
               ))}

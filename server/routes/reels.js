@@ -17,6 +17,8 @@ router.post('/', auth, async (req, res) => {
       musicName: req.body.musicName || '',
       musicArtist: req.body.musicArtist || '',
       filter: req.body.filter || 'Original',
+      trimStart: req.body.trimStart || 0,
+      trimEnd: req.body.trimEnd || 15,
       thumbnail: req.body.thumbnail || '',
       author: req.user.id
     });

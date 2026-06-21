@@ -16,5 +16,13 @@ export const noteApi = {
   downloadNote: async (id) => {
     const res = await api.put(`/notes/${id}/download`);
     return res.data;
+  },
+  getNoteById: async (id) => {
+    const res = await api.get(`/notes/${id}`);
+    return res.data;
+  },
+  reviewNote: async (id, data) => {
+    const res = await api.post(`/notes/${id}/review`, data);
+    return res.data;
   }
 };

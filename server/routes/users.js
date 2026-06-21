@@ -3,6 +3,52 @@ const router = express.Router();
 const User = require('../models/User');
 const auth = require('../middleware/auth');
 
+// Get user analytics
+router.get('/analytics', auth, async (req, res) => {
+  try {
+    const Project = require('../models/Project');
+    const Note = require('../models/Note');
+    const Post = require('../models/Post');
+
+    // Projects stats
+    const projects = await Project.find({ owner: req.user.id });
+    const projectViews = projects.reduce((acc, p) => acc + (p.views || 0), 0);
+    const projectUpvotes = projects.reduce((acc, p) => acc + (p.upvotes?.length || 0), 0);
+
+    // Notes stats
+    const notes = await Note.find({ uploader: req.user.id });
+    const noteDownloads = notes.reduce((acc, n) => acc + (n.downloads || 0), 0);
+
+    // Posts stats
+    const posts = await Post.find({ author: req.user.id });
+    const postLikes = posts.reduce((acc, p) => acc + (p.likes?.length || 0), 0);
+    const postComments = posts.reduce((acc, p) => acc + (p.comments?.length || 0), 0);
+
+    // Timeline data (mock 7 days for the chart)
+    const today = new Date();
+    const timeline = Array.from({length: 7}).map((_, i) => {
+      const d = new Date(today);
+      d.setDate(d.getDate() - (6 - i));
+      return {
+        date: d.toISOString().split('T')[0],
+        views: Math.floor(Math.random() * 50) + 10, // Mocked daily data since we don't have time-series views
+        engagement: Math.floor(Math.random() * 20) + 5
+      };
+    });
+
+    res.json({
+      projectsCount: projects.length,
+      notesCount: notes.length,
+      postsCount: posts.length,
+      totalViews: projectViews,
+      totalEngagement: projectUpvotes + noteDownloads + postLikes + postComments,
+      timeline
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
 // Get current user profile
 router.get('/me', auth, async (req, res) => {
   try {

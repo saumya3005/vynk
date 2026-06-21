@@ -14,6 +14,7 @@ const noteRoutes = require('./routes/notes');
 const communityRoutes = require('./routes/communities');
 const messageRoutes = require('./routes/messages');
 const notificationRoutes = require('./routes/notifications');
+const searchRoutes = require('./routes/search');
 
 const app = express();
 const server = http.createServer(app);
@@ -64,6 +65,7 @@ app.use('/api/notes', noteRoutes);
 app.use('/api/communities', communityRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/search', searchRoutes);
 
 const storyRoutes = require('./routes/stories');
 const reelRoutes = require('./routes/reels');
@@ -113,6 +115,10 @@ io.on('connection', (socket) => {
 
   socket.on('deleteMessage', ({ messageId, receiverId }) => {
     if (receiverId) io.to(receiverId).emit('messageDeleted', { messageId });
+  });
+
+  socket.on('markSeen', ({ senderId, receiverId }) => {
+    if (senderId) io.to(senderId).emit('messagesSeen', { senderId, receiverId });
   });
 
   // WebRTC signaling

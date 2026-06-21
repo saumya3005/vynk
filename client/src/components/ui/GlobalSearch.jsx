@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, Loader, UserPlus, UserCheck } from 'lucide-react';
+import { Search, Loader, Users, Target, BookOpen, Hash } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -7,7 +7,7 @@ import useDebounce from '../../hooks/useDebounce';
 
 const GlobalSearch = ({ onNavigate }) => {
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState([]);
+  const [results, setResults] = useState({ users: [], projects: [], notes: [], communities: [] });
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -18,7 +18,7 @@ const GlobalSearch = ({ onNavigate }) => {
   useEffect(() => {
     const fetchResults = async () => {
       if (!debouncedQuery.trim()) {
-        setResults([]);
+        setResults({ users: [], projects: [], notes: [], communities: [] });
         setIsOpen(false);
         return;
       }
@@ -26,7 +26,7 @@ const GlobalSearch = ({ onNavigate }) => {
       setIsLoading(true);
       setIsOpen(true);
       try {
-        const res = await api.get(`/users/search?q=${encodeURIComponent(debouncedQuery)}`);
+        const res = await api.get(`/search?q=${encodeURIComponent(debouncedQuery)}`);
         setResults(res.data);
       } catch (err) {
         console.error('Search error:', err);
@@ -48,12 +48,14 @@ const GlobalSearch = ({ onNavigate }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleUserClick = (userId) => {
+  const handleNavigate = (path) => {
     setIsOpen(false);
     setQuery('');
-    navigate(`/profile/${userId}`);
+    navigate(path);
     if (onNavigate) onNavigate();
   };
+
+  const hasResults = results.users?.length > 0 || results.projects?.length > 0 || results.notes?.length > 0 || results.communities?.length > 0;
 
   return (
     <div className="relative w-full" ref={dropdownRef}>
@@ -67,7 +69,7 @@ const GlobalSearch = ({ onNavigate }) => {
             if (!isOpen) setIsOpen(true);
           }}
           onFocus={() => { if (query.trim()) setIsOpen(true); }}
-          placeholder="Search Vynk (users, skills, roles)..."
+          placeholder="Search Vynk..."
           className="w-full bg-white/60 border border-border rounded-full py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:bg-white transition-all text-text placeholder:text-muted/80"
         />
         {isLoading && (
@@ -82,36 +84,92 @@ const GlobalSearch = ({ onNavigate }) => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 5, scale: 0.98 }}
             transition={{ duration: 0.2 }}
-            className="absolute top-full left-0 w-full mt-2 bg-white rounded-2xl shadow-xl border border-border overflow-hidden z-50 max-h-96 overflow-y-auto"
+            className="absolute top-full left-0 w-full mt-2 bg-white rounded-2xl shadow-xl border border-border overflow-hidden z-50 max-h-[80vh] overflow-y-auto"
           >
-            {results.length > 0 ? (
+            {hasResults ? (
               <div className="py-2">
-                <div className="px-4 py-2 text-xs font-bold text-muted uppercase tracking-wider bg-bg/50">
-                  People
-                </div>
-                {results.map((user) => (
-                  <div
-                    key={user._id}
-                    className="flex items-center justify-between p-3 hover:bg-surface cursor-pointer transition-colors"
-                    onClick={() => handleUserClick(user._id)}
-                  >
-                    <div className="flex items-center gap-3 overflow-hidden">
-                      <div className="w-10 h-10 rounded-full bg-linear-to-tr from-secondary to-accent shrink-0 overflow-hidden">
-                        {user.avatar ? (
-                          <img src={user.avatar} alt="avatar" className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-white font-bold text-sm">
-                            {user.username[0].toUpperCase()}
-                          </div>
-                        )}
-                      </div>
-                      <div className="overflow-hidden">
-                        <p className="font-bold text-sm text-text truncate">{user.username}</p>
-                        <p className="text-xs text-muted truncate">{user.role || 'Member'}</p>
-                      </div>
+                
+                {results.users?.length > 0 && (
+                  <div className="mb-2">
+                    <div className="px-4 py-2 text-xs font-bold text-muted uppercase tracking-wider bg-bg/50 flex items-center gap-2">
+                      <Users size={14}/> People
                     </div>
+                    {results.users.map((user) => (
+                      <div
+                        key={user._id}
+                        className="flex items-center gap-3 p-3 hover:bg-surface cursor-pointer transition-colors"
+                        onClick={() => handleNavigate(`/profile/${user._id}`)}
+                      >
+                        <div className="w-8 h-8 rounded-full bg-linear-to-tr from-secondary to-accent shrink-0 overflow-hidden">
+                          {user.avatar ? (
+                            <img src={user.avatar} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-white font-bold text-xs">
+                              {user.username[0].toUpperCase()}
+                            </div>
+                          )}
+                        </div>
+                        <div className="overflow-hidden">
+                          <p className="font-bold text-sm text-text truncate">{user.username}</p>
+                          <p className="text-xs text-muted truncate">{user.role || 'Member'}</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
+
+                {results.projects?.length > 0 && (
+                  <div className="mb-2">
+                    <div className="px-4 py-2 text-xs font-bold text-muted uppercase tracking-wider bg-bg/50 flex items-center gap-2">
+                      <Target size={14}/> Projects
+                    </div>
+                    {results.projects.map((project) => (
+                      <div
+                        key={project._id}
+                        className="p-3 hover:bg-surface cursor-pointer transition-colors"
+                        onClick={() => handleNavigate(`/projects/${project._id}`)}
+                      >
+                        <p className="font-bold text-sm text-text truncate">{project.title}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {results.communities?.length > 0 && (
+                  <div className="mb-2">
+                    <div className="px-4 py-2 text-xs font-bold text-muted uppercase tracking-wider bg-bg/50 flex items-center gap-2">
+                      <Hash size={14}/> Communities
+                    </div>
+                    {results.communities.map((community) => (
+                      <div
+                        key={community._id}
+                        className="p-3 hover:bg-surface cursor-pointer transition-colors"
+                        onClick={() => handleNavigate(`/communities/${community._id}`)}
+                      >
+                        <p className="font-bold text-sm text-text truncate">{community.name}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {results.notes?.length > 0 && (
+                  <div>
+                    <div className="px-4 py-2 text-xs font-bold text-muted uppercase tracking-wider bg-bg/50 flex items-center gap-2">
+                      <BookOpen size={14}/> Notes
+                    </div>
+                    {results.notes.map((note) => (
+                      <div
+                        key={note._id}
+                        className="p-3 hover:bg-surface cursor-pointer transition-colors"
+                        onClick={() => handleNavigate(`/notes/${note._id}`)}
+                      >
+                        <p className="font-bold text-sm text-text truncate">{note.title}</p>
+                        <p className="text-xs text-muted truncate">{note.subject}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
               </div>
             ) : (
               !isLoading && (

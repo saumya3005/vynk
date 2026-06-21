@@ -200,7 +200,7 @@ const Explore = () => {
             onClick={() => setActiveTab(tab.toLowerCase())}
             className={`px-6 py-2.5 rounded-full font-bold whitespace-nowrap transition-all ${
               activeTab === tab.toLowerCase() 
-              ? 'bg-text text-white shadow-md' 
+              ? 'bg-ink text-white shadow-md' 
               : 'bg-white border border-border text-muted hover:text-text hover:bg-white/80'
             }`}
           >

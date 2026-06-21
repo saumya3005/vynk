@@ -56,7 +56,7 @@ const CommunityCard = ({ comm }) => {
             className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
               isJoined 
                 ? 'bg-surface border border-border text-muted hover:text-red-500 hover:border-red-500' 
-                : 'bg-text text-white hover:bg-primary'
+                : 'bg-ink text-white hover:bg-primary'
             }`}
           >
             {isJoined ? 'Joined' : 'Join'}

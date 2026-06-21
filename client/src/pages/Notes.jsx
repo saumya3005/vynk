@@ -8,8 +8,10 @@ import toast from 'react-hot-toast';
 const NoteCard = ({ note }) => {
   const [isSaved, setIsSaved] = useState(false);
   const [downloads, setDownloads] = useState(note.downloads || 0);
+  const navigate = useNavigate();
 
-  const handleSave = async () => {
+  const handleSave = async (e) => {
+    e.stopPropagation();
     try {
       await noteApi.saveNote(note._id);
       setIsSaved(!isSaved);
@@ -19,7 +21,8 @@ const NoteCard = ({ note }) => {
     }
   };
 
-  const handleDownload = async () => {
+  const handleDownload = async (e) => {
+    e.stopPropagation();
     try {
       const updatedDownloads = await noteApi.downloadNote(note._id);
       setDownloads(updatedDownloads);
@@ -33,11 +36,16 @@ const NoteCard = ({ note }) => {
     }
   };
 
+  const handleNavigate = () => {
+    navigate(`/notes/${note._id}`);
+  };
+
   return (
     <motion.div 
+      onClick={handleNavigate}
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="glass-card p-5 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full"
+      className="glass-card p-5 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full cursor-pointer"
     >
       <div className={`w-12 h-12 rounded-2xl bg-linear-to-tr from-primary to-secondary flex items-center justify-center text-white mb-4 shadow-lg`}>
         <FileText size={24} />

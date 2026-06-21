@@ -16,6 +16,7 @@ import CreateProject from './pages/CreateProject';
 import ProjectDetails from './pages/ProjectDetails';
 import Notes from './pages/Notes';
 import UploadNotes from './pages/UploadNotes';
+import NoteDetails from './pages/NoteDetails';
 import Communities from './pages/Communities';
 import CommunityDetails from './pages/CommunityDetails';
 import Chat from './pages/Chat';
@@ -51,7 +52,7 @@ function App() {
             <Route path="/notes" element={<Notes />} />
             <Route path="/notes/upload" element={<UploadNotes />} />
             <Route path="/upload-notes" element={<UploadNotes />} />
-            <Route path="/notes/:id" element={<Notes />} />
+            <Route path="/notes/:id" element={<NoteDetails />} />
             
             <Route path="/communities" element={<Communities />} />
             <Route path="/communities/:id" element={<CommunityDetails />} />

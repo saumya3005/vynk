@@ -58,20 +58,20 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
-// Like project
-router.put('/:id/like', auth, async (req, res) => {
+// Upvote project
+router.put('/:id/upvote', auth, async (req, res) => {
   try {
     const project = await Project.findById(req.params.id);
     if (!project) return res.status(404).json({ message: 'Project not found' });
     
-    if (project.likes.includes(req.user.id)) {
-      project.likes = project.likes.filter(id => id.toString() !== req.user.id);
+    if (project.upvotes.includes(req.user.id)) {
+      project.upvotes = project.upvotes.filter(id => id.toString() !== req.user.id);
     } else {
-      project.likes.push(req.user.id);
+      project.upvotes.push(req.user.id);
     }
     
     await project.save();
-    res.json(project.likes);
+    res.json(project.upvotes);
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }

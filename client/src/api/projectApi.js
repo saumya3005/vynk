@@ -9,8 +9,8 @@ export const projectApi = {
     const res = await api.post('/projects', data);
     return res.data;
   },
-  likeProject: async (id) => {
-    const res = await api.put(`/projects/${id}/like`);
+  upvoteProject: async (id) => {
+    const res = await api.put(`/projects/${id}/upvote`);
     return res.data;
   },
   collaborate: async (id) => {

@@ -79,9 +79,95 @@ router.put('/:id/leave', auth, async (req, res) => {
     if (!community) return res.status(404).json({ message: 'Community not found' });
 
     community.members = community.members.filter(id => id.toString() !== req.user.id);
+    community.admins = community.admins.filter(id => id.toString() !== req.user.id);
+    community.moderators = community.moderators.filter(id => id.toString() !== req.user.id);
     await community.save();
     
     res.json(community.members);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Join Request
+router.post('/:id/request', auth, async (req, res) => {
+  try {
+    const community = await Community.findById(req.params.id);
+    if (!community) return res.status(404).json({ message: 'Community not found' });
+
+    const existingReq = community.joinRequests.find(r => r.user.toString() === req.user.id && r.status === 'pending');
+    if (existingReq) return res.status(400).json({ message: 'Request already pending' });
+
+    community.joinRequests.push({ user: req.user.id, message: req.body.message || '' });
+    await community.save();
+
+    res.json(community.joinRequests);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Manage Join Request
+router.put('/:id/request/:requestId', auth, async (req, res) => {
+  try {
+    const community = await Community.findById(req.params.id);
+    if (!community) return res.status(404).json({ message: 'Community not found' });
+
+    const isAdminOrMod = community.admins.includes(req.user.id) || community.moderators.includes(req.user.id);
+    if (!isAdminOrMod) return res.status(403).json({ message: 'Not authorized' });
+
+    const request = community.joinRequests.id(req.params.requestId);
+    if (!request) return res.status(404).json({ message: 'Request not found' });
+
+    request.status = req.body.status; // 'approved' or 'rejected'
+
+    if (req.body.status === 'approved') {
+      if (!community.members.includes(request.user)) {
+        community.members.push(request.user);
+      }
+    }
+
+    await community.save();
+    res.json(community.joinRequests);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Create Channel
+router.post('/:id/channels', auth, async (req, res) => {
+  try {
+    const community = await Community.findById(req.params.id);
+    if (!community) return res.status(404).json({ message: 'Community not found' });
+
+    const isAdminOrMod = community.admins.includes(req.user.id) || community.moderators.includes(req.user.id);
+    if (!isAdminOrMod) return res.status(403).json({ message: 'Not authorized' });
+
+    community.channels.push({
+      name: req.body.name,
+      type: req.body.type || 'text',
+      description: req.body.description || ''
+    });
+
+    await community.save();
+    res.json(community.channels);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Delete Channel
+router.delete('/:id/channels/:channelId', auth, async (req, res) => {
+  try {
+    const community = await Community.findById(req.params.id);
+    if (!community) return res.status(404).json({ message: 'Community not found' });
+
+    const isAdmin = community.admins.includes(req.user.id);
+    if (!isAdmin) return res.status(403).json({ message: 'Not authorized' });
+
+    community.channels.pull(req.params.channelId);
+    await community.save();
+    res.json(community.channels);
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }

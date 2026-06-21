@@ -64,7 +64,7 @@ const Sidebar = () => {
               key={item.path}
               to={item.path}
               className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 group relative ${
-                isActive ? 'text-text font-bold bg-white shadow-sm' : 'text-muted hover:bg-white/60 hover:text-text font-medium'
+                isActive ? 'text-text font-bold bg-surface-soft shadow-sm border border-border/40' : 'text-muted hover:bg-surface-soft/60 hover:text-text font-medium'
               }`}
             >
               {isActive && (
@@ -80,7 +80,7 @@ const Sidebar = () => {
           <Link
             to="/recruiter"
             className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 group relative ${
-              location.pathname.startsWith('/recruiter') ? 'text-text font-bold bg-white shadow-sm' : 'text-muted hover:bg-white/60 hover:text-text font-medium'
+              location.pathname.startsWith('/recruiter') ? 'text-text font-bold bg-surface-soft shadow-sm border border-border/40' : 'text-muted hover:bg-surface-soft/60 hover:text-text font-medium'
             }`}
           >
             {location.pathname.startsWith('/recruiter') && (
@@ -98,7 +98,7 @@ const Sidebar = () => {
       <div className="relative mt-auto" ref={menuRef}>
         <button
           onClick={() => setShowUserMenu(!showUserMenu)}
-          className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/60 transition-colors w-full group text-left"
+          className="flex items-center gap-3 p-3 rounded-xl hover:bg-surface-soft/80 transition-colors w-full group text-left"
         >
           <div className="w-10 h-10 rounded-full bg-linear-to-tr from-secondary to-accent border-2 border-transparent group-hover:border-primary transition-all overflow-hidden shrink-0">
              {user?.avatar && <img src={user.avatar} alt="avatar" className="w-full h-full object-cover" />}
@@ -116,7 +116,7 @@ const Sidebar = () => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
               transition={{ duration: 0.15 }}
-              className="absolute bottom-full left-0 w-full mb-2 bg-white rounded-xl shadow-xl border border-border overflow-hidden z-50"
+              className="absolute bottom-full left-0 w-full mb-2 bg-surface-soft rounded-xl shadow-xl border border-border overflow-hidden z-50"
             >
               <button onClick={() => { setShowUserMenu(false); navigate('/profile'); }} className="flex items-center gap-3 w-full p-3 hover:bg-surface transition-colors text-sm font-semibold text-text text-left">
                 <User size={18} className="text-primary" /> View Profile
@@ -128,7 +128,7 @@ const Sidebar = () => {
                 <RefreshCw size={18} className="text-secondary" /> Switch Account
               </button>
               <div className="border-t border-border"></div>
-              <button onClick={handleLogout} className="flex items-center gap-3 w-full p-3 hover:bg-red-50 transition-colors text-sm font-semibold text-red-500 text-left">
+              <button onClick={handleLogout} className="flex items-center gap-3 w-full p-3 hover:bg-red-950/20 transition-colors text-sm font-semibold text-red-500 text-left">
                 <LogOut size={18} /> Logout
               </button>
             </motion.div>

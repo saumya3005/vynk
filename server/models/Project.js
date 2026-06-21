@@ -18,7 +18,7 @@ const projectSchema = new mongoose.Schema({
   images: [{ type: String }],
   publicIds: [{ type: String }],
   teamMembers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  upvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   saves: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   comments: [commentSchema],
   collaborationOpen: { type: Boolean, default: false },

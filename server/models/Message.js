@@ -5,7 +5,7 @@ const messageSchema = new mongoose.Schema({
   receiverId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   text: { type: String, default: '' },
   mediaUrl: { type: String, default: '' },
-  mediaType: { type: String, enum: ['text', 'image', 'video', 'file', 'sticker', 'emoji'], default: 'text' },
+  mediaType: { type: String, enum: ['text', 'image', 'video', 'file', 'sticker', 'emoji', 'audio'], default: 'text' },
   fileName: { type: String, default: '' },
   fileSize: { type: Number, default: 0 },
   sticker: { type: String, default: '' },

@@ -17,6 +17,8 @@ const reelSchema = new mongoose.Schema({
   musicName: { type: String, default: '' },
   musicArtist: { type: String, default: '' },
   filter: { type: String, default: 'Original' },
+  trimStart: { type: Number, default: 0 },
+  trimEnd: { type: Number, default: 15 },
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   saves: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   comments: [commentSchema],

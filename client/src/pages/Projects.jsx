@@ -1,23 +1,23 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, Plus, Globe, ExternalLink, Heart, Eye } from 'lucide-react';
+import { Search, Filter, Plus, Globe, ExternalLink, ArrowBigUp, Eye } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { projectApi } from '../api/projectApi';
 import toast from 'react-hot-toast';
 
 const ProjectCard = ({ project, onUpdate }) => {
-  const [isLiked, setIsLiked] = useState(false); // Can be linked to AuthContext to check if liked
-  const [likesCount, setLikesCount] = useState(project.likes?.length || 0);
+  const [isUpvoted, setIsUpvoted] = useState(false);
+  const [upvotesCount, setUpvotesCount] = useState(project.upvotes?.length || 0);
   const navigate = useNavigate();
 
-  const handleLike = async (e) => {
+  const handleUpvote = async (e) => {
     e.stopPropagation();
     try {
-      const updatedLikes = await projectApi.likeProject(project._id);
-      setIsLiked(!isLiked);
-      setLikesCount(updatedLikes.length);
+      const updatedUpvotes = await projectApi.upvoteProject(project._id);
+      setIsUpvoted(!isUpvoted);
+      setUpvotesCount(updatedUpvotes.length);
     } catch (err) {
-      toast.error('Failed to like project');
+      toast.error('Failed to upvote project');
     }
   };
 
@@ -81,8 +81,8 @@ const ProjectCard = ({ project, onUpdate }) => {
           
           <div className="flex items-center gap-3 text-xs font-semibold text-muted">
             <span className="flex items-center gap-1"><Eye size={14} /> {project.views || 0}</span>
-            <button onClick={handleLike} className="flex items-center gap-1 group-hover:text-primary transition-colors hover:text-primary">
-              <Heart size={14} className={isLiked ? 'fill-primary text-primary' : ''} /> {likesCount}
+            <button onClick={handleUpvote} className="flex items-center gap-1 group-hover:text-primary transition-colors hover:text-primary">
+              <ArrowBigUp size={16} className={isUpvoted ? 'fill-primary text-primary' : ''} /> {upvotesCount}
             </button>
           </div>
         </div>
@@ -149,7 +149,7 @@ const Projects = () => {
               key={tab} 
               onClick={() => setActiveTab(tab)}
               className={`whitespace-nowrap px-4 py-2 rounded-xl text-sm font-bold transition-all ${
-                activeTab === tab ? 'bg-text text-white shadow-md' : 'bg-white border border-border text-muted hover:text-text'
+                activeTab === tab ? 'bg-ink text-white shadow-md' : 'bg-white border border-border text-muted hover:text-text'
               }`}
             >
               {tab}

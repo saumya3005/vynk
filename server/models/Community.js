@@ -19,6 +19,19 @@ const communitySchema = new mongoose.Schema({
   bannerPublicId: { type: String },
   members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   admins: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  moderators: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  isPrivate: { type: Boolean, default: false },
+  joinRequests: [{
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    message: { type: String, default: '' },
+    status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
+    createdAt: { type: Date, default: Date.now }
+  }],
+  channels: [{
+    name: { type: String, required: true },
+    type: { type: String, enum: ['text', 'forum', 'announcement'], default: 'text' },
+    description: { type: String }
+  }],
   posts: [communityPostSchema]
 }, { timestamps: true });
 

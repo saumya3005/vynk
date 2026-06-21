@@ -67,7 +67,7 @@ const Register = () => {
   return (
     <div className="min-h-screen flex bg-bg">
       {/* Left Hero — hidden on mobile */}
-      <div className="hidden lg:flex flex-1 relative overflow-hidden items-center justify-center bg-text">
+      <div className="hidden lg:flex flex-1 relative overflow-hidden items-center justify-center bg-ink">
         {/* Floating gradient blobs */}
         <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-primary/30 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-accent/30 rounded-full blur-3xl animate-pulse delay-1000" />
@@ -180,7 +180,11 @@ const Register = () => {
                 </div>
               </div>
 
-              <button type="submit" disabled={isLoading || !allValid} className="mt-2 w-full py-3.5 rounded-xl bg-text text-white font-semibold text-sm flex items-center justify-center gap-2 hover:bg-text/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+              <button
+                type="submit"
+                disabled={isLoading || !allValid}
+                className="auth-submit-btn"
+              >
                 {isLoading ? <Loader size={18} className="animate-spin" /> : <UserPlus size={18} />}
                 {isLoading ? 'Creating account...' : 'Create Account'}
               </button>

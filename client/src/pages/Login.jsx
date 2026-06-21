@@ -90,7 +90,7 @@ const Login = () => {
   return (
     <div className="min-h-screen flex bg-bg">
       {/* Left Hero — hidden on mobile */}
-      <div className="hidden lg:flex flex-1 relative overflow-hidden items-center justify-center bg-text">
+      <div className="hidden lg:flex flex-1 relative overflow-hidden items-center justify-center bg-ink">
         <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-primary/30 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-accent/30 rounded-full blur-3xl animate-pulse delay-1000" />
         <div className="absolute top-1/2 left-1/2 w-48 h-48 bg-secondary/20 rounded-full blur-3xl animate-pulse delay-500" />
@@ -145,7 +145,11 @@ const Login = () => {
                       </div>
                     </div>
 
-                    <button type="submit" disabled={isLoading || !formData.email || !formData.password} className="mt-4 w-full py-3.5 rounded-xl bg-text text-white font-semibold text-sm flex items-center justify-center gap-2 hover:bg-text/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+                    <button
+                      type="submit"
+                      disabled={isLoading || !formData.email || !formData.password}
+                      className="auth-submit-btn"
+                    >
                       {isLoading ? <Loader size={18} className="animate-spin" /> : <LogIn size={18} />}
                       {isLoading ? 'Signing in...' : 'Sign In'}
                     </button>
@@ -185,7 +189,11 @@ const Login = () => {
                       ))}
                     </div>
 
-                    <button type="submit" disabled={isLoading || otpCode.join('').length < 6} className="w-full py-3.5 rounded-xl bg-text text-white font-semibold text-sm flex items-center justify-center gap-2 hover:bg-text/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+                    <button
+                      type="submit"
+                      disabled={isLoading || otpCode.join('').length < 6}
+                      className="auth-submit-btn"
+                    >
                       {isLoading ? <Loader size={18} className="animate-spin" /> : <ArrowRight size={18} />}
                       Verify & Sign In
                     </button>

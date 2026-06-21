@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext, useRef } from 'react';
-import { Send, Search, MessageCircle, X, Paperclip, Smile, Image as ImageIcon, Video, FileText, Trash2, Reply, ChevronLeft, Phone } from 'lucide-react';
+import { Send, Search, MessageCircle, X, Paperclip, Smile, Image as ImageIcon, Video, FileText, Trash2, Reply, ChevronLeft, Phone, Mic, Square } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import { messageApi } from '../api/messageApi';
 import io from 'socket.io-client';
@@ -40,6 +40,13 @@ const Chat = () => {
   const [previewFile, setPreviewFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
   const [previewType, setPreviewType] = useState('');
+
+  // Voice recording
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingDuration, setRecordingDuration] = useState(0);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const recordingTimerRef = useRef(null);
 
   const activeChatUser = chatUsers.find(u => u._id === activeChatUserId) || searchResults.find(u => u._id === activeChatUserId) || null;
 
@@ -87,6 +94,15 @@ const Chat = () => {
 
     newSocket.on('messageDeleted', ({ messageId }) => {
       setMessages(prev => prev.filter(m => m._id !== messageId));
+    });
+
+    newSocket.on('messagesSeen', ({ senderId, receiverId }) => {
+      setMessages(prev => prev.map(m => {
+        if ((m.sender === senderId || m.sender?._id === senderId) && (m.receiverId === receiverId || m.receiverId?._id === receiverId)) {
+          return { ...m, seen: true };
+        }
+        return m;
+      }));
     });
 
     newSocket.on('incomingCall', (data) => {
@@ -144,6 +160,32 @@ const Chat = () => {
       console.error('Failed to load messages');
     }
   };
+
+  const markMessagesAsSeen = async () => {
+    if (!activeChatUserId) return;
+    try {
+      // Find unread messages received from activeChatUserId
+      const unreadIds = messages.filter(m => (m.sender === activeChatUserId || m.sender?._id === activeChatUserId) && !m.seen).map(m => m._id);
+      for (const id of unreadIds) {
+        await messageApi.markSeen(id);
+      }
+      if (socket) {
+        socket.emit('markSeen', { senderId: activeChatUserId, receiverId: user.id });
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Auto mark seen when new message arrives and chat is active
+  useEffect(() => {
+    if (messages.length > 0 && activeChatUserId) {
+      const lastMsg = messages[messages.length - 1];
+      if ((lastMsg.sender === activeChatUserId || lastMsg.sender?._id === activeChatUserId) && !lastMsg.seen) {
+        markMessagesAsSeen();
+      }
+    }
+  }, [messages, activeChatUserId]);
 
   // Typing indicator
   let typingTimeout = useRef(null);
@@ -271,8 +313,67 @@ const Chat = () => {
   const getLastMessagePreview = (u) => {
     if (!u.lastMessage) return '';
     if (u.lastMessage.sticker) return u.lastMessage.sticker;
+    if (u.lastMessage.mediaType === 'audio') return '🎤 Voice note';
     if (u.lastMessage.mediaUrl) return '📎 Attachment';
     return u.lastMessage.text?.substring(0, 30) || '';
+  };
+
+  // Voice Note Logic
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      audioChunksRef.current = [];
+
+      mediaRecorderRef.current.ondataavailable = (e) => {
+        if (e.data.size > 0) audioChunksRef.current.push(e.data);
+      };
+
+      mediaRecorderRef.current.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPreviewUrl(reader.result);
+          setPreviewType('audio');
+          setPreviewFile(new File([audioBlob], 'voice_note.webm', { type: 'audio/webm' }));
+        };
+        reader.readAsDataURL(audioBlob);
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
+      setRecordingDuration(0);
+      recordingTimerRef.current = setInterval(() => setRecordingDuration(prev => prev + 1), 1000);
+    } catch (err) {
+      toast.error('Microphone access denied');
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      clearInterval(recordingTimerRef.current);
+    }
+  };
+
+  const cancelRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      clearInterval(recordingTimerRef.current);
+      setPreviewFile(null);
+      setPreviewUrl('');
+      setPreviewType('');
+      audioChunksRef.current = [];
+    }
+  };
+
+  const formatRecordingTime = (seconds) => {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
   };
 
   return (
@@ -399,6 +500,9 @@ const Chat = () => {
                             {m.mediaUrl && m.mediaType === 'video' && (
                               <video src={m.mediaUrl} controls className="rounded-lg max-h-48 mb-1 max-w-full" />
                             )}
+                            {m.mediaUrl && m.mediaType === 'audio' && (
+                              <audio src={m.mediaUrl} controls className="mb-1 w-64 max-w-full" />
+                            )}
                             {m.mediaUrl && m.mediaType === 'file' && (
                               <div className="flex items-center gap-2 p-2 bg-white/20 rounded-lg mb-1">
                                 <FileText size={18} />
@@ -475,11 +579,12 @@ const Chat = () => {
                   {previewType === 'image' && <img src={previewUrl} alt="" className="w-12 h-12 object-cover rounded-lg" />}
                   {previewType === 'video' && <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center"><Video size={18} className="text-primary" /></div>}
                   {previewType === 'file' && <div className="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center"><FileText size={18} className="text-secondary" /></div>}
+                  {previewType === 'audio' && <div className="flex-1 flex items-center gap-3 bg-red-500/10 p-2 rounded-lg"><Mic size={18} className="text-red-500 animate-pulse" /><audio src={previewUrl} controls className="h-8 flex-1" /></div>}
                   <div className="flex-1 overflow-hidden">
-                    <p className="text-sm font-semibold text-text truncate">{previewFile.name}</p>
+                    {previewType !== 'audio' && <p className="text-sm font-semibold text-text truncate">{previewFile.name}</p>}
                     <p className="text-xs text-muted">{(previewFile.size / 1024).toFixed(1)} KB</p>
                   </div>
-                  <button onClick={() => { setPreviewFile(null); setPreviewUrl(''); }} className="text-muted hover:text-red-500"><X size={16} /></button>
+                  <button onClick={() => { setPreviewFile(null); setPreviewUrl(''); setPreviewType(''); }} className="text-muted hover:text-red-500"><X size={16} /></button>
                 </div>
               )}
 
@@ -552,26 +657,49 @@ const Chat = () => {
                   🎭
                 </button>
 
-                <input
-                  type="text"
-                  placeholder="Type a message..."
-                  className="flex-1 glass-input py-2.5 text-sm"
-                  value={msg}
-                  onChange={e => { setMsg(e.target.value); handleTyping(); }}
-                  onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-                />
+                {isRecording ? (
+                  <div className="flex-1 flex items-center justify-between px-4 py-2 bg-red-50 text-red-500 rounded-xl border border-red-100">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                      <span className="text-sm font-medium">{formatRecordingTime(recordingDuration)}</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <button onClick={cancelRecording} className="text-muted hover:text-text"><Trash2 size={16} /></button>
+                      <button onClick={stopRecording} className="p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600"><Square size={14} fill="currentColor" /></button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <input
+                      type="text"
+                      placeholder="Type a message..."
+                      className="flex-1 glass-input py-2.5 text-sm"
+                      value={msg}
+                      onChange={e => { setMsg(e.target.value); handleTyping(); }}
+                      onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+                    />
 
-                <button onClick={() => { setShowAttachMenu(!showAttachMenu); setShowEmojiPicker(false); setShowStickerPicker(false); }} className="p-2.5 rounded-xl hover:bg-white/80 text-muted transition-colors shrink-0">
-                  <Paperclip size={20} />
-                </button>
+                    <button onClick={() => { setShowAttachMenu(!showAttachMenu); setShowEmojiPicker(false); setShowStickerPicker(false); }} className="p-2.5 rounded-xl hover:bg-white/80 text-muted transition-colors shrink-0">
+                      <Paperclip size={20} />
+                    </button>
 
-                <button
-                  onClick={handleSend}
-                  disabled={!msg.trim() && !previewFile}
-                  className="p-2.5 bg-linear-to-r from-primary to-accent text-white rounded-xl disabled:opacity-40 hover:shadow-lg transition-all shrink-0"
-                >
-                  <Send size={18} />
-                </button>
+                    {msg.trim() || previewFile ? (
+                      <button
+                        onClick={handleSend}
+                        className="p-2.5 bg-linear-to-r from-primary to-accent text-white rounded-xl hover:shadow-lg transition-all shrink-0"
+                      >
+                        <Send size={18} />
+                      </button>
+                    ) : (
+                      <button
+                        onClick={startRecording}
+                        className="p-2.5 bg-surface text-muted rounded-xl hover:bg-white/80 hover:text-primary transition-colors shrink-0"
+                      >
+                        <Mic size={18} />
+                      </button>
+                    )}
+                  </>
+                )}
               </div>
             </>
           ) : (
