@@ -130,41 +130,40 @@ const ReelCard = ({ reel: initialReel, isActive, onPrev, onNext, totalReels, cur
   };
 
   return (
-    <div className="relative w-full h-full bg-black shrink-0 overflow-hidden" onClick={handleVideoClick}>
-      {/* Video */}
-      <video
-        ref={videoRef}
-        src={reel.videoUrl}
-        loop
-        muted={isMuted}
-        playsInline
-        onTimeUpdate={handleTimeUpdate}
-        style={{ filter: getFilterStyle(reel.filter) }}
-        className="w-full h-full object-cover"
-      />
-
-      {/* Dark gradient overlays */}
-      <div className="absolute inset-0 bg-linear-to-b from-black/20 via-transparent to-black/80 pointer-events-none" />
-
-      {/* Progress bar at top */}
-      <div className="absolute top-0 left-0 w-full h-0.5 bg-white/20">
-        <motion.div
-          className="h-full bg-white"
-          style={{ width: `${progress}%` }}
-          transition={{ duration: 0.1 }}
+    <>
+      <div className="reel-video" onClick={handleVideoClick}>
+        {/* Video */}
+        <video
+          ref={videoRef}
+          src={reel.videoUrl}
+          loop
+          muted={isMuted}
+          playsInline
+          onTimeUpdate={handleTimeUpdate}
+          style={{ filter: getFilterStyle(reel.filter) }}
         />
-      </div>
 
-      {/* Top controls */}
-      <div className="absolute top-4 left-0 right-0 flex items-center justify-between px-4 z-20">
-        <div className="text-white text-xs font-bold opacity-60">{currentIndex + 1} / {totalReels}</div>
-        <button
-          onClick={(e) => { e.stopPropagation(); setIsMuted(m => !m); }}
-          className="w-9 h-9 bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center text-white"
-        >
-          {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-        </button>
-      </div>
+        {/* Dark gradient overlays */}
+        <div className="reel-overlay" />
+
+        {/* Progress bar at bottom */}
+        <div className="reel-progress">
+          <motion.div
+            className="h-full bg-white"
+            style={{ width: `${progress}%` }}
+            transition={{ duration: 0.1 }}
+          />
+        </div>
+
+        {/* Top controls (Mute / Unmute) */}
+        <div className="absolute top-16 right-4 z-20">
+          <button
+            onClick={(e) => { e.stopPropagation(); setIsMuted(m => !m); }}
+            className="w-9 h-9 bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/60 transition-colors"
+          >
+            {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+          </button>
+        </div>
 
       {/* Play/Pause indicator */}
       <AnimatePresence>
@@ -184,18 +183,18 @@ const ReelCard = ({ reel: initialReel, isActive, onPrev, onNext, totalReels, cur
 
       {/* Right action rail */}
       <div
-        className="absolute right-3 bottom-24 flex flex-col items-center gap-5 z-20"
+        className="reel-action-rail"
         onClick={e => e.stopPropagation()}
       >
         {/* Creator avatar */}
         <div className="flex flex-col items-center gap-1 mb-2">
-          <div className="w-11 h-11 rounded-full border-2 border-white overflow-hidden shadow-lg">
+          <div className="w-11 h-11 rounded-full border-2 border-white overflow-hidden shadow-lg cursor-pointer hover:scale-105 transition-transform" onClick={() => window.location.href = `/profile/${reel.author?._id}`}>
             {reel.author?.avatar
               ? <img src={reel.author.avatar} alt="" className="w-full h-full object-cover" />
               : <div className="w-full h-full bg-linear-to-tr from-primary to-secondary flex items-center justify-center text-white text-xs font-black">{reel.author?.username?.[0]?.toUpperCase()}</div>
             }
           </div>
-          <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center -mt-3 shadow-md">
+          <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center -mt-4 shadow-md">
             <Plus size={12} className="text-white" />
           </div>
         </div>
@@ -225,18 +224,14 @@ const ReelCard = ({ reel: initialReel, isActive, onPrev, onNext, totalReels, cur
           activeColor="text-yellow-400"
           fillActive={true}
         />
-        <ActionBtn
-          icon={MoreVertical}
-          onClick={(e) => { e.stopPropagation(); setShowMore(m => !m); }}
-        />
       </div>
 
       {/* Bottom info */}
       <div
-        className="absolute bottom-4 left-4 right-20 z-20 pointer-events-none"
+        className="reel-bottom-info"
         onClick={e => e.stopPropagation()}
       >
-        <p className="font-black text-white text-sm mb-0.5 pointer-events-auto cursor-pointer hover:underline">
+        <p className="font-black text-white text-sm mb-0.5 pointer-events-auto cursor-pointer hover:underline" onClick={() => window.location.href = `/profile/${reel.author?._id}`}>
           @{reel.author?.username}
         </p>
         {reel.caption && (
@@ -288,7 +283,7 @@ const ReelCard = ({ reel: initialReel, isActive, onPrev, onNext, totalReels, cur
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
             onClick={(e) => { e.stopPropagation(); setShowShare(false); }}
           >
             <motion.div
@@ -319,7 +314,8 @@ const ReelCard = ({ reel: initialReel, isActive, onPrev, onNext, totalReels, cur
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+      </div>
+    </>
   );
 };
 
@@ -542,10 +538,10 @@ const Reels = () => {
   }, [activeIndex, showUploader, reels.length]);
 
   return (
-    <div className="fixed inset-0 top-16 bg-black z-0 overflow-hidden">
-      {/* Top Tabs */}
-      <div className="absolute top-0 left-0 right-0 z-30 pt-4 px-6 flex justify-between items-center bg-linear-to-b from-black/80 to-transparent pointer-events-none">
-        <div className="flex gap-6 pointer-events-auto">
+    <div className="reels-page">
+      <div className="reels-stage">
+        {/* Top Tabs */}
+        <div className="reel-tabs">
           {['Following', 'Reels', 'Trending'].map(tab => (
             <button
               key={tab}
@@ -558,34 +554,32 @@ const Reels = () => {
         </div>
         <button
           onClick={() => setShowUploader(true)}
-          className="pointer-events-auto flex items-center gap-2 bg-primary/20 backdrop-blur-md border border-primary/50 text-white px-4 py-2 rounded-full font-bold text-sm hover:bg-primary/40 transition-colors"
+          className="absolute top-4 right-4 z-30 pointer-events-auto flex items-center gap-2 bg-primary/20 backdrop-blur-md border border-primary/50 text-white px-3 py-1.5 rounded-full font-bold text-sm hover:bg-primary/40 transition-colors"
         >
-          <Plus size={16} /> Create
+          <Plus size={16} />
         </button>
-      </div>
 
-      {/* Feed Container */}
-      {isLoading ? (
-        <div className="flex flex-col items-center justify-center h-full gap-4 text-white">
-          <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm font-semibold opacity-60">Loading reels...</p>
-        </div>
-      ) : reels.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-full text-white text-center px-8">
-          <Video size={56} className="opacity-30 mb-4" />
-          <h3 className="text-xl font-black mb-2">No reels yet</h3>
-          <p className="text-sm opacity-60 mb-6">Be the first to share a short video!</p>
-          <button onClick={() => setShowUploader(true)} className="btn-primary">Upload Reel</button>
-        </div>
-      ) : (
-        <div
-          ref={containerRef}
-          className="h-full overflow-y-auto snap-y snap-mandatory"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-        >
-          {reels.map((reel, idx) => (
-            <div key={reel._id} className="w-full h-full snap-start shrink-0">
+        {/* Feed Container */}
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center h-full gap-4 text-white">
+            <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm font-semibold opacity-60">Loading reels...</p>
+          </div>
+        ) : reels.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-white text-center px-8">
+            <Video size={56} className="opacity-30 mb-4" />
+            <h3 className="text-xl font-black mb-2">No reels yet</h3>
+            <p className="text-sm opacity-60 mb-6">Be the first to share a short video!</p>
+            <button onClick={() => setShowUploader(true)} className="btn-primary">Upload Reel</button>
+          </div>
+        ) : (
+          <div
+            ref={containerRef}
+            className="reel-shell"
+          >
+            {reels.map((reel, idx) => (
               <ReelCard
+                key={reel._id}
                 reel={reel}
                 isActive={idx === activeIndex}
                 currentIndex={idx}
@@ -593,10 +587,9 @@ const Reels = () => {
                 onPrev={() => goTo(idx - 1)}
                 onNext={() => goTo(idx + 1)}
               />
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
 
       {/* Keyboard navigation indicator */}
       {reels.length > 0 && (
@@ -623,6 +616,7 @@ const Reels = () => {
           />
         )}
       </AnimatePresence>
+      </div>
     </div>
   );
 };
