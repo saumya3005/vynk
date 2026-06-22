@@ -49,4 +49,34 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
+router.get('/trending', auth, async (req, res) => {
+  try {
+    const [users, projects, notes, communities] = await Promise.all([
+      User.find({ profileVisibility: 'public' })
+        .sort({ followers: -1 })
+        .limit(10)
+        .select('username avatar role skills'),
+        
+      Project.find()
+        .sort({ views: -1, 'upvotes': -1 })
+        .limit(10)
+        .select('title techStack views owner'),
+        
+      Note.find()
+        .sort({ downloads: -1 })
+        .limit(10)
+        .select('title subject downloads uploader'),
+        
+      Community.find()
+        .sort({ members: -1 })
+        .limit(10)
+        .select('name banner membersCount')
+    ]);
+
+    res.json({ users, projects, notes, communities });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message || 'Server error' });
+  }
+});
+
 module.exports = router;

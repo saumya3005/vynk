@@ -24,17 +24,36 @@ router.get('/analytics', auth, async (req, res) => {
     const postLikes = posts.reduce((acc, p) => acc + (p.likes?.length || 0), 0);
     const postComments = posts.reduce((acc, p) => acc + (p.comments?.length || 0), 0);
 
-    // Timeline data (mock 7 days for the chart)
+    // Real Timeline Data Generation
     const today = new Date();
-    const timeline = Array.from({length: 7}).map((_, i) => {
+    today.setHours(0, 0, 0, 0);
+    const timelineMap = {};
+    for (let i = 6; i >= 0; i--) {
       const d = new Date(today);
-      d.setDate(d.getDate() - (6 - i));
-      return {
-        date: d.toISOString().split('T')[0],
-        views: Math.floor(Math.random() * 50) + 10, // Mocked daily data since we don't have time-series views
-        engagement: Math.floor(Math.random() * 20) + 5
-      };
+      d.setDate(d.getDate() - i);
+      timelineMap[d.toISOString().split('T')[0]] = { views: 0, engagement: 0 };
+    }
+
+    // Since we don't track time-series views, we'll map "Activity/Creation" to the timeline
+    // Posts created = engagement spike, Projects created = views spike
+    posts.forEach(p => {
+      const dateStr = p.createdAt?.toISOString().split('T')[0];
+      if (timelineMap[dateStr]) timelineMap[dateStr].engagement += 5;
     });
+    projects.forEach(p => {
+      const dateStr = p.createdAt?.toISOString().split('T')[0];
+      if (timelineMap[dateStr]) timelineMap[dateStr].views += 10;
+    });
+    notes.forEach(n => {
+      const dateStr = n.createdAt?.toISOString().split('T')[0];
+      if (timelineMap[dateStr]) timelineMap[dateStr].engagement += 3;
+    });
+
+    const timeline = Object.keys(timelineMap).map(date => ({
+      date,
+      views: timelineMap[date].views || 1, // Fallback to 1 to show a minimal bar
+      engagement: timelineMap[date].engagement || 1
+    }));
 
     res.json({
       projectsCount: projects.length,
@@ -169,27 +188,103 @@ router.put('/:id/follow', auth, async (req, res) => {
     }
 
     const isFollowing = currentUser.following.map(id => id.toString()).includes(req.params.id);
+    const hasRequested = currentUser.pendingFollows?.map(id => id.toString()).includes(req.params.id);
 
     if (isFollowing) {
+      // Unfollow
       currentUser.following = currentUser.following.filter(id => id.toString() !== req.params.id);
       userToFollow.followers = userToFollow.followers.filter(id => id.toString() !== req.user.id);
+    } else if (hasRequested) {
+      // Cancel request
+      currentUser.pendingFollows = currentUser.pendingFollows.filter(id => id.toString() !== req.params.id);
+      userToFollow.followRequests = userToFollow.followRequests.filter(id => id.toString() !== req.user.id);
     } else {
-      currentUser.following.push(req.params.id);
-      userToFollow.followers.push(req.user.id);
-      
-      const Notification = require('../models/Notification');
-      await Notification.create({
-        user: req.params.id,
-        type: 'follow',
-        message: `${currentUser.username} started following you.`,
-        link: `/profile/${currentUser._id}`
-      });
+      // Request or Follow
+      if (userToFollow.profileVisibility === 'private') {
+        if (!currentUser.pendingFollows) currentUser.pendingFollows = [];
+        if (!userToFollow.followRequests) userToFollow.followRequests = [];
+        currentUser.pendingFollows.push(req.params.id);
+        userToFollow.followRequests.push(req.user.id);
+        
+        const Notification = require('../models/Notification');
+        await Notification.create({
+          user: req.params.id,
+          type: 'follow_request',
+          message: `${currentUser.username} requested to follow you.`,
+          link: `/profile/${currentUser._id}`
+        });
+        await currentUser.save();
+        await userToFollow.save();
+        return res.json({ following: currentUser.following, pendingFollows: currentUser.pendingFollows, status: 'requested' });
+      } else {
+        currentUser.following.push(req.params.id);
+        userToFollow.followers.push(req.user.id);
+        
+        const Notification = require('../models/Notification');
+        await Notification.create({
+          user: req.params.id,
+          type: 'follow',
+          message: `${currentUser.username} started following you.`,
+          link: `/profile/${currentUser._id}`
+        });
+      }
     }
 
     await currentUser.save();
     await userToFollow.save();
 
-    res.json({ following: currentUser.following, isFollowing: !isFollowing });
+    res.json({ following: currentUser.following, pendingFollows: currentUser.pendingFollows, isFollowing: !isFollowing });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message || 'Server error' });
+  }
+});
+
+// Accept Follow Request
+router.put('/:id/follow/accept', auth, async (req, res) => {
+  try {
+    const me = await User.findById(req.user.id);
+    const requester = await User.findById(req.params.id);
+
+    if (!me || !requester) return res.status(404).json({ success: false, message: 'User not found' });
+
+    me.followRequests = me.followRequests.filter(id => id.toString() !== req.params.id);
+    requester.pendingFollows = requester.pendingFollows.filter(id => id.toString() !== req.user.id);
+
+    me.followers.push(req.params.id);
+    requester.following.push(req.user.id);
+
+    const Notification = require('../models/Notification');
+    await Notification.create({
+      user: req.params.id,
+      type: 'follow_accept',
+      message: `${me.username} accepted your follow request.`,
+      link: `/profile/${me._id}`
+    });
+
+    await me.save();
+    await requester.save();
+
+    res.json({ success: true, followRequests: me.followRequests });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message || 'Server error' });
+  }
+});
+
+// Reject Follow Request
+router.put('/:id/follow/reject', auth, async (req, res) => {
+  try {
+    const me = await User.findById(req.user.id);
+    const requester = await User.findById(req.params.id);
+
+    if (!me || !requester) return res.status(404).json({ success: false, message: 'User not found' });
+
+    me.followRequests = me.followRequests.filter(id => id.toString() !== req.params.id);
+    requester.pendingFollows = requester.pendingFollows.filter(id => id.toString() !== req.user.id);
+
+    await me.save();
+    await requester.save();
+
+    res.json({ success: true, followRequests: me.followRequests });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message || 'Server error' });
   }

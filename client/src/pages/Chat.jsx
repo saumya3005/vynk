@@ -382,9 +382,12 @@ const Chat = () => {
 
       <div className="glass-card flex flex-1 overflow-hidden rounded-2xl">
         {/* Sidebar */}
-        <div className={`${showMobileSidebar ? 'flex' : 'hidden md:flex'} w-full md:w-80 lg:w-96 border-r border-border flex-col bg-white/40`}>
-          <div className="p-4 border-b border-border">
-            <h2 className="font-bold text-xl mb-3 text-text">Messages</h2>
+        <div className={`${showMobileSidebar ? 'flex' : 'hidden md:flex'} w-full md:w-80 lg:w-96 border-r border-border flex-col bg-surface/60 backdrop-blur-sm`}>
+          <div className="p-4 border-b border-border/50 bg-surface-soft/30">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="font-black text-xl text-text">Messages</h2>
+              <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" title="Live" />
+            </div>
             <div className="relative">
               <Search className="absolute left-3 top-2.5 text-muted" size={16} />
               <input
@@ -405,37 +408,64 @@ const Chat = () => {
 
           <div className="flex-1 overflow-y-auto">
             {displayUsers.length === 0 ? (
-              <div className="p-6 text-center text-sm text-muted">
-                {searchQuery ? 'No users found' : 'Search for users to start chatting'}
+              <div className="p-8 text-center">
+                <MessageCircle size={40} className="mx-auto mb-3 text-muted opacity-30" />
+                <p className="text-sm font-bold text-muted">{searchQuery ? 'No users found' : 'Search for someone to chat with'}</p>
               </div>
             ) : (
-              displayUsers.map(u => (
-                <button
-                  key={u._id}
-                  onClick={() => setActiveChatUserId(u._id)}
-                  className={`w-full p-3 flex gap-3 items-center transition-colors text-left ${activeChatUserId === u._id ? 'bg-primary/10 border-l-4 border-l-primary' : 'hover:bg-white/60 border-l-4 border-l-transparent'}`}
-                >
-                  <div className="relative shrink-0">
-                    <div className="w-11 h-11 rounded-full overflow-hidden bg-primary/20">
-                      {u.avatar ? <img src={u.avatar} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-primary font-bold">{u.username?.[0]?.toUpperCase()}</div>}
+              displayUsers.map(u => {
+                const unreadCount = u.unreadCount || 0;
+                return (
+                  <button
+                    key={u._id}
+                    onClick={() => setActiveChatUserId(u._id)}
+                    className={`w-full p-3.5 flex gap-3 items-center transition-colors text-left border-b border-border/20 ${
+                      activeChatUserId === u._id
+                        ? 'bg-primary/10 border-l-4 border-l-primary'
+                        : 'hover:bg-surface-soft/60 border-l-4 border-l-transparent'
+                    }`}
+                  >
+                    <div className="relative shrink-0">
+                      <div className="w-12 h-12 rounded-full overflow-hidden bg-linear-to-tr from-primary/30 to-secondary/30">
+                        {u.avatar
+                          ? <img src={u.avatar} alt="" className="w-full h-full object-cover" />
+                          : <div className="w-full h-full flex items-center justify-center text-primary font-black text-lg">{u.username?.[0]?.toUpperCase()}</div>
+                        }
+                      </div>
+                      {onlineUsers.has(u._id) && <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-surface rounded-full" />}
                     </div>
-                    {onlineUsers.has(u._id) && <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />}
-                  </div>
-                  <div className="flex-1 overflow-hidden">
-                    <div className="flex justify-between items-baseline">
-                      <h4 className="font-bold text-sm text-text truncate">{u.username}</h4>
-                      {u.lastMessage && <span className="text-[10px] text-muted shrink-0">{formatTime(u.lastMessage.createdAt)}</span>}
+                    <div className="flex-1 overflow-hidden">
+                      <div className="flex justify-between items-baseline gap-1">
+                        <h4 className="font-bold text-sm text-text truncate">{u.username}</h4>
+                        {u.lastMessage && (
+                          <span className={`text-[10px] shrink-0 ${unreadCount > 0 ? 'text-primary font-bold' : 'text-muted'}`}>
+                            {formatTime(u.lastMessage.createdAt)}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-between mt-0.5">
+                        <p className={`text-xs truncate flex-1 ${unreadCount > 0 ? 'text-text font-semibold' : 'text-muted'}`}>
+                          {typingUsers.has(u._id)
+                            ? <span className="text-primary animate-pulse">typing...</span>
+                            : getLastMessagePreview(u) || u.role || 'Member'
+                          }
+                        </p>
+                        {unreadCount > 0 && (
+                          <span className="ml-2 min-w-5 h-5 rounded-full bg-primary text-white text-[10px] font-black flex items-center justify-center px-1 shrink-0">
+                            {unreadCount > 9 ? '9+' : unreadCount}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <p className="text-xs text-muted truncate">{getLastMessagePreview(u) || u.role || 'Member'}</p>
-                  </div>
-                </button>
-              ))
+                  </button>
+                );
+              })
             )}
           </div>
         </div>
 
         {/* Chat Area */}
-        <div className={`${!showMobileSidebar ? 'flex' : 'hidden md:flex'} flex-1 flex-col bg-linear-to-b from-white/5 to-white/20`}>
+        <div className={`${!showMobileSidebar ? 'flex' : 'hidden md:flex'} flex-1 flex-col bg-linear-to-b from-surface/20 via-surface/10 to-surface/30 relative`}>
           {activeChatUser ? (
             <>
               {/* Header */}
@@ -703,10 +733,12 @@ const Chat = () => {
               </div>
             </>
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center text-muted">
-              <MessageCircle size={56} className="mb-4 opacity-15" />
-              <p className="font-bold text-xl text-text/40">Your Messages</p>
-              <p className="text-sm mt-1">Search for a user and start chatting</p>
+            <div className="flex-1 flex flex-col items-center justify-center p-8">
+              <div className="w-24 h-24 rounded-3xl bg-linear-to-tr from-primary/20 to-secondary/20 flex items-center justify-center mb-5 border border-border/30">
+                <MessageCircle size={40} className="text-primary/60" />
+              </div>
+              <h2 className="font-black text-xl text-text/60 mb-2">Your Messages</h2>
+              <p className="text-sm text-muted text-center max-w-xs">Search for a user on the left and start a conversation. All messages are end-to-end persisted.</p>
             </div>
           )}
         </div>

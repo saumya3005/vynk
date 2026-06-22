@@ -9,6 +9,9 @@ import { formatDistanceToNow } from 'date-fns';
 import CommentDrawer from '../components/ui/CommentDrawer';
 import MediaUploader from '../components/ui/MediaUploader';
 import StoryCreatorModal from '../components/ui/StoryCreatorModal';
+import { PostSkeleton } from '../components/ui/Skeleton';
+import { EmptyState } from '../components/ui/EmptyState';
+import { Image as ImageIcon2 } from 'lucide-react';
 
 const StoryRing = ({ story, onClick }) => (
   <div onClick={onClick} className="flex flex-col items-center gap-1 cursor-pointer group shrink-0">
@@ -486,13 +489,19 @@ const Feed = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [activeTab]);
 
   const fetchData = async () => {
     setIsLoading(true);
     try {
+      let postsPromise;
+      if (activeTab === 'For You') postsPromise = postApi.getFeedForYou();
+      else if (activeTab === 'Following') postsPromise = postApi.getFeedFollowing();
+      else if (activeTab === 'Trending') postsPromise = postApi.getFeedTrending();
+      else postsPromise = postApi.getPosts(); // fallback
+
       const [fetchedPosts, fetchedStories] = await Promise.all([
-        postApi.getPosts(),
+        postsPromise,
         storyApi.getStories().catch(() => [])
       ]);
       setPosts(fetchedPosts);
@@ -556,7 +565,7 @@ const Feed = () => {
 
       {/* Tabs */}
       <div className="flex gap-6 mb-6 border-b border-border/30 px-2">
-        {['For You', 'Following', 'Students', 'Developers'].map(tab => (
+        {['For You', 'Following', 'Trending'].map(tab => (
           <button 
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -573,14 +582,16 @@ const Feed = () => {
       {/* Feed Posts */}
       <div className="flex flex-col gap-2">
         {isLoading ? (
-          <div className="flex justify-center py-10">
-            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <div className="flex flex-col gap-6">
+            <PostSkeleton />
+            <PostSkeleton />
           </div>
         ) : posts.length === 0 ? (
-          <div className="text-center py-10 text-muted bg-surface-soft/20 rounded-2xl border border-border/45">
-            <p className="font-bold">No posts yet</p>
-            <p className="text-sm">Be the first to share something!</p>
-          </div>
+          <EmptyState 
+            icon={ImageIcon2}
+            title={`No posts in ${activeTab}`}
+            message={activeTab === 'Following' ? "Follow some creators to see their posts here." : "Be the first to share something!"}
+          />
         ) : (
           <AnimatePresence>
             {posts.map(post => (

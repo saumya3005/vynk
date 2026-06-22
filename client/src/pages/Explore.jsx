@@ -3,10 +3,11 @@ import { motion } from 'framer-motion';
 import { Search, TrendingUp, Users, Briefcase, FileText, FileVideo } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { userApi } from '../api/userApi';
+import { searchApi } from '../api/searchApi';
 import { postApi } from '../api/postApi';
-import { projectApi } from '../api/projectApi';
-import { noteApi } from '../api/noteApi';
 import toast from 'react-hot-toast';
+import { EmptyState } from '../components/ui/EmptyState';
+import { Skeleton } from '../components/ui/Skeleton';
 
 const Explore = () => {
   const navigate = useNavigate();
@@ -42,17 +43,16 @@ const Explore = () => {
   const fetchInitialData = async () => {
     setIsLoading(true);
     try {
-      const [uRes, pRes, projRes, nRes] = await Promise.all([
+      const [uRes, tRes, pRes] = await Promise.all([
         userApi.getSuggestions().catch(() => []),
-        postApi.getPosts().catch(() => []),
-        projectApi.getProjects().catch(() => []),
-        noteApi.getNotes().catch(() => [])
+        searchApi.getTrending().catch(() => ({ users: [], projects: [], notes: [], communities: [] })),
+        postApi.getFeedTrending().catch(() => [])
       ]);
       setSuggestedUsers(uRes.slice(0, 5));
-      setUsers(uRes);
-      setPosts(pRes.slice(0, 10)); // Top 10 for trending
-      setProjects(projRes);
-      setNotes(nRes);
+      setUsers(tRes.users);
+      setPosts(pRes);
+      setProjects(tRes.projects);
+      setNotes(tRes.notes);
     } catch (err) {
       console.error(err);
     } finally {
@@ -63,20 +63,13 @@ const Explore = () => {
   const performSearch = async (q) => {
     setIsLoading(true);
     try {
-      const [uRes, pRes, projRes, nRes] = await Promise.all([
-        userApi.searchUsers(q).catch(() => []),
-        postApi.getPosts().catch(() => []),
-        projectApi.getProjects().catch(() => []),
-        noteApi.getNotes().catch(() => [])
-      ]);
-
-      setUsers(uRes);
+      const sRes = await searchApi.globalSearch(q);
+      setUsers(sRes.users || []);
+      setProjects(sRes.projects || []);
+      setNotes(sRes.notes || []);
       
-      const lowerQ = q.toLowerCase();
-      setPosts(pRes.filter(p => p.content?.toLowerCase().includes(lowerQ)));
-      setProjects(projRes.filter(p => p.title?.toLowerCase().includes(lowerQ) || p.description?.toLowerCase().includes(lowerQ)));
-      setNotes(nRes.filter(n => n.title?.toLowerCase().includes(lowerQ) || n.subject?.toLowerCase().includes(lowerQ)));
-
+      // Keep trending posts if search posts not supported, or hide posts
+      setPosts([]);
     } catch (err) {
       console.error(err);
     } finally {
@@ -87,28 +80,31 @@ const Explore = () => {
   const renderContent = () => {
     if (isLoading) {
       return (
-        <div className="flex justify-center items-center py-20">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+        <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
+          <div className="break-inside-avoid glass-card p-6 min-h-50"><Skeleton className="h-full w-full" /></div>
+          <div className="break-inside-avoid glass-card p-6 min-h-75"><Skeleton className="h-full w-full" /></div>
+          <div className="break-inside-avoid glass-card p-6 min-h-62.5"><Skeleton className="h-full w-full" /></div>
         </div>
       );
     }
 
     if (activeTab === 'people') {
-      if (users.length === 0) return <div className="text-center py-10 text-muted">No people found.</div>;
+      if (users.length === 0) return <EmptyState icon={Users} title="No people found" message="Try searching for someone else." />;
       return (
-        <div className="flex flex-col gap-4">
+        <div className="columns-1 md:columns-2 gap-6 space-y-6">
           {users.map(u => (
-            <div key={u._id} className="glass-card p-4 flex items-center justify-between cursor-pointer hover:bg-white/40" onClick={() => navigate(`/profile/${u._id}`)}>
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full overflow-hidden bg-primary/20">
-                  {u.avatar ? <img src={u.avatar} alt="" className="w-full h-full object-cover"/> : <div className="w-full h-full flex items-center justify-center text-xl font-bold text-primary">{u.username?.[0]?.toUpperCase()}</div>}
-                </div>
-                <div>
-                  <h4 className="font-bold text-text">{u.username}</h4>
-                  <p className="text-xs text-muted">{u.role || 'Member'} • {u.location || 'Earth'}</p>
-                </div>
+            <div key={u._id} className="break-inside-avoid glass-card p-5 flex flex-col items-center cursor-pointer hover:bg-white/40 transition-colors" onClick={() => navigate(`/profile/${u._id}`)}>
+              <div className="w-20 h-20 rounded-full overflow-hidden bg-primary/20 mb-3 border-2 border-primary/20">
+                {u.avatar ? <img src={u.avatar} alt="" className="w-full h-full object-cover"/> : <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-primary">{u.username?.[0]?.toUpperCase()}</div>}
               </div>
-              <button className="btn-secondary text-xs px-4 py-1.5" onClick={(e) => { e.stopPropagation(); navigate(`/profile/${u._id}`); }}>View</button>
+              <h4 className="font-bold text-text text-lg">{u.username}</h4>
+              <p className="text-sm text-muted mb-4">{u.role || 'Member'} • {u.location || 'Earth'}</p>
+              <div className="flex flex-wrap gap-2 justify-center mb-4">
+                {u.skills?.slice(0, 3).map((s, i) => (
+                  <span key={i} className="text-xs bg-surface-soft text-text px-2 py-1 rounded-md">{s}</span>
+                ))}
+              </div>
+              <button className="btn-secondary w-full py-2" onClick={(e) => { e.stopPropagation(); navigate(`/profile/${u._id}`); }}>View Profile</button>
             </div>
           ))}
         </div>
@@ -116,16 +112,24 @@ const Explore = () => {
     }
 
     if (activeTab === 'projects') {
-      if (projects.length === 0) return <div className="text-center py-10 text-muted">No projects found.</div>;
+      if (projects.length === 0) return <EmptyState icon={Briefcase} title="No projects found" message="Try searching for something else." />;
       return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
           {projects.map(p => (
-            <div key={p._id} className="glass-card p-5 cursor-pointer hover:-translate-y-1 transition-transform" onClick={() => navigate(`/projects/${p._id}`)}>
-              <h4 className="font-bold text-lg mb-2 truncate text-text group-hover:text-primary">{p.title}</h4>
-              <p className="text-sm text-muted line-clamp-2 mb-3">{p.description}</p>
-              <div className="flex items-center gap-2">
-                <img src={p.owner?.avatar || 'https://via.placeholder.com/40'} alt="" className="w-6 h-6 rounded-full object-cover" />
-                <span className="text-xs font-bold">{p.owner?.username}</span>
+            <div key={p._id} className="break-inside-avoid glass-card p-5 cursor-pointer hover:-translate-y-1 transition-transform border border-border/40" onClick={() => navigate(`/projects/${p._id}`)}>
+              <h4 className="font-bold text-lg mb-2 text-text group-hover:text-primary">{p.title}</h4>
+              <p className="text-sm text-muted mb-4">{p.description}</p>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {p.techStack?.slice(0, 3).map((tech, i) => (
+                  <span key={i} className="text-[10px] uppercase tracking-wider font-bold bg-accent/10 text-accent px-2 py-1 rounded-sm">{tech}</span>
+                ))}
+              </div>
+              <div className="flex items-center justify-between border-t border-border/40 pt-4 mt-auto">
+                <div className="flex items-center gap-2">
+                  <img src={p.owner?.avatar || 'https://via.placeholder.com/40'} alt="" className="w-6 h-6 rounded-full object-cover" />
+                  <span className="text-xs font-bold text-text">{p.owner?.username}</span>
+                </div>
+                <span className="text-xs font-bold text-muted">{p.views || 0} views</span>
               </div>
             </div>
           ))}
@@ -134,17 +138,21 @@ const Explore = () => {
     }
 
     if (activeTab === 'notes') {
-      if (notes.length === 0) return <div className="text-center py-10 text-muted">No notes found.</div>;
+      if (notes.length === 0) return <EmptyState icon={FileText} title="No notes found" message="Try searching for another subject." />;
       return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="columns-1 md:columns-2 gap-6 space-y-6">
           {notes.map(n => (
-            <div key={n._id} className="glass-card p-5">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary"><FileText size={20} /></div>
+            <div key={n._id} className="break-inside-avoid glass-card p-5 border border-border/40 flex flex-col">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-12 h-12 rounded-2xl bg-linear-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-white shadow-lg shrink-0"><FileText size={24} /></div>
                 <div>
-                  <h4 className="font-bold text-text truncate">{n.title}</h4>
-                  <p className="text-xs text-muted">{n.subject} • {n.semester}</p>
+                  <h4 className="font-bold text-text text-lg leading-tight">{n.title}</h4>
+                  <p className="text-sm text-muted mt-1">{n.subject} • {n.semester}</p>
                 </div>
+              </div>
+              <div className="flex justify-between items-center mt-auto border-t border-border/40 pt-4">
+                <span className="text-xs font-medium text-muted">{n.downloads || 0} Downloads</span>
+                <button className="text-xs font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-lg hover:bg-primary hover:text-white transition-colors">Download</button>
               </div>
             </div>
           ))}
@@ -152,25 +160,27 @@ const Explore = () => {
       );
     }
 
-    // Default: trending posts
-    if (posts.length === 0) return <div className="text-center py-10 text-muted">No posts found.</div>;
+    // Default: trending posts (masonry layout like pinterest)
+    if (posts.length === 0) return <EmptyState icon={TrendingUp} title="No trending posts" message="Check back later for trending content." />;
     return (
-      <div className="flex flex-col gap-6">
+      <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
         {posts.map(post => (
-          <div key={post._id} className="glass-card p-6 cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate(`/feed`)}>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full overflow-hidden bg-primary/20">
-                {post.author?.avatar ? <img src={post.author.avatar} alt="" className="w-full h-full object-cover"/> : <div className="w-full h-full flex items-center justify-center font-bold text-primary">{post.author?.username?.[0]?.toUpperCase()}</div>}
-              </div>
-              <div>
-                <span className="font-bold text-text">{post.author?.username}</span>
-                <span className="text-xs text-muted block">{new Date(post.createdAt).toLocaleDateString()}</span>
+          <div key={post._id} className="break-inside-avoid glass-card overflow-hidden cursor-pointer hover:shadow-xl transition-shadow border border-border/40" onClick={() => navigate(`/feed`)}>
+            {post.mediaUrl && post.mediaType === 'image' && (
+               <img src={post.mediaUrl} alt="" className="w-full h-auto object-cover" />
+            )}
+            <div className="p-5">
+              <p className="text-text leading-relaxed text-sm mb-4">{post.content}</p>
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full overflow-hidden bg-primary/20">
+                  {post.author?.avatar ? <img src={post.author.avatar} alt="" className="w-full h-full object-cover"/> : <div className="w-full h-full flex items-center justify-center font-bold text-xs text-primary">{post.author?.username?.[0]?.toUpperCase()}</div>}
+                </div>
+                <div>
+                  <span className="font-bold text-sm text-text block">{post.author?.username}</span>
+                  <span className="text-[10px] text-muted block">{new Date(post.createdAt).toLocaleDateString()}</span>
+                </div>
               </div>
             </div>
-            {post.mediaUrl && post.mediaType === 'image' && (
-               <img src={post.mediaUrl} alt="" className="w-full max-h-64 object-cover rounded-xl mb-4" />
-            )}
-            <p className="text-text/80 leading-relaxed line-clamp-3">{post.content}</p>
           </div>
         ))}
       </div>

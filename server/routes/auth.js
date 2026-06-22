@@ -214,6 +214,31 @@ router.post('/logout', (req, res) => {
   res.json({ success: true, message: 'Logged out successfully' });
 });
 
+// Change Password (authenticated)
+router.put('/change-password', auth, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ success: false, message: 'Current and new password are required' });
+    }
+    const passwordIssues = validatePassword(newPassword);
+    if (passwordIssues.length > 0) {
+      return res.status(400).json({ success: false, message: `Password must contain ${passwordIssues.join(', ')}` });
+    }
+    const user = await User.findById(req.user.id);
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) return res.status(400).json({ success: false, message: 'Current password is incorrect' });
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+    await user.save();
+    res.json({ success: true, message: 'Password changed successfully' });
+  } catch (err) {
+    console.error('Change password error:', err.message);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
 // Forgot Password
 router.post('/forgot-password', async (req, res) => {
   try {

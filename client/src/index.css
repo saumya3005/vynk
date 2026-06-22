@@ -4,45 +4,42 @@
 @theme {
   --color-primary: #FF5F45;
   --color-secondary: #7B61FF;
-  --color-accent: #00D4FF;
-  --color-success: #00C896;
-  --color-warning: #FFB800;
-  --color-ink: #05070F;
-  --color-muted: #9CA3AF;
-  --color-surface: #0B0F1A;
-  --color-surface-soft: #121829;
-  --color-border-premium: rgba(123, 97, 255, 0.15);
-
-  /* *** CRITICAL: These must be in @theme for Tailwind v4 to generate utility classes *** */
-  --color-text: #F3F4F6;
-  --color-bg: #05070F;
-  --color-border: rgba(123, 97, 255, 0.15);
-  --color-card: rgba(11, 15, 26, 0.65);
+  --color-accent: #00C2FF;
+  --color-success: #00D26A;
+  
+  /* Logical colors for Tailwind */
+  --color-text: var(--text);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+  --color-card: var(--card);
 
   --font-sans: "Outfit", "Inter", sans-serif;
 
-  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.3);
-  --shadow-premium: 0 10px 40px rgba(123, 97, 255, 0.15);
+  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.05);
+  --shadow-premium: 0 10px 40px rgba(0, 0, 0, 0.1);
   --radius-xl: 1rem;
   --radius-2xl: 1.5rem;
 }
 
 :root {
-  --bg: #05070F;
-  --surface: #0B0F1A;
-  --card: rgba(11, 15, 26, 0.65);
-  --text: #F3F4F6;
-  --muted: #9CA3AF;
-  --primary: #FF5F45;
-  --secondary: #7B61FF;
-  --accent: #00D4FF;
-  --success: #00C896;
-  --warning: #FFB800;
-  --border: rgba(123, 97, 255, 0.15);
-  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.3);
-  --shadow-premium: 0 10px 40px rgba(123, 97, 255, 0.15);
-  --radius-xl: 1rem;
-  --radius-2xl: 1.5rem;
+  /* Default: Dark Theme */
+  --bg: #090A0F;
+  --surface: rgba(30, 18, 24, 0.78);
+  --card: rgba(30, 18, 24, 0.5);
+  --text: #F8F4EF;
+  --muted: #8B7E76;
+  --border: rgba(255, 255, 255, 0.14);
+}
+
+.light, [data-theme='light'] {
+  --bg: #FAF4EA;
+  --surface: rgba(255, 255, 255, 0.72);
+  --card: rgba(255, 255, 255, 0.9);
+  --text: #111111;
+  --muted: #8B7E76;
+  --border: rgba(0, 0, 0, 0.1);
 }
 
 /* === Base Styles === */

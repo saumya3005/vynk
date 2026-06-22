@@ -36,5 +36,17 @@ export const userApi = {
   searchUsers: async (q) => {
     const res = await api.get(`/users/search?q=${encodeURIComponent(q)}`);
     return res.data;
+  },
+  acceptFollowRequest: async (requesterId) => {
+    const res = await api.put(`/users/${requesterId}/follow/accept`);
+    return res.data;
+  },
+  rejectFollowRequest: async (requesterId) => {
+    const res = await api.put(`/users/${requesterId}/follow/reject`);
+    return res.data;
+  },
+  getFollowRequests: async () => {
+    const res = await api.get('/users/me');
+    return res.data.followRequests || [];
   }
 };

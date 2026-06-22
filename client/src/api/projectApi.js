@@ -20,5 +20,9 @@ export const projectApi = {
   viewProject: async (id) => {
     const res = await api.post(`/projects/${id}/view`);
     return res.data;
+  },
+  getProjectById: async (id) => {
+    const res = await api.get(`/projects/${id}`);
+    return res.data;
   }
 };

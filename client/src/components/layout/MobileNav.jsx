@@ -1,7 +1,8 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Compass, PlusSquare, MessageSquare, User } from 'lucide-react';
+import { Home, Compass, MessageSquare, User, Search } from 'lucide-react';
 import { useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
+import GlobalCreateDropdown from '../ui/GlobalCreateDropdown';
 
 const MobileNav = () => {
   const { user } = useContext(AuthContext);
@@ -10,26 +11,24 @@ const MobileNav = () => {
   const navItems = [
     { icon: Home, path: '/feed' },
     { icon: Compass, path: '/explore' },
-    { icon: PlusSquare, path: '/create', special: true },
+    { special: true }, // Create dropdown
     { icon: MessageSquare, path: '/chat' },
     { icon: User, path: '/profile' },
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 w-full bg-white/80 backdrop-blur-xl border-t border-border z-50 pb-safe">
+    <nav className="md:hidden fixed bottom-0 left-0 w-full bg-surface/90 backdrop-blur-xl border-t border-border z-50 pb-safe">
       <div className="flex justify-around items-center h-16 px-2">
         {navItems.map((item, idx) => {
-          const isActive = location.pathname.startsWith(item.path.split('/')[1] ? `/${item.path.split('/')[1]}` : item.path);
-          
           if (item.special) {
             return (
-              <Link key={idx} to={item.path} className="flex flex-col items-center justify-center -mt-6">
-                <div className="w-12 h-12 rounded-full bg-linear-to-tr from-primary to-secondary flex items-center justify-center text-white shadow-lg shadow-primary/30">
-                  <item.icon size={24} />
-                </div>
-              </Link>
+              <div key={idx} className="flex flex-col items-center justify-center -mt-6">
+                <GlobalCreateDropdown isMobile={true} />
+              </div>
             );
           }
+          
+          const isActive = location.pathname.startsWith(item.path.split('/')[1] ? `/${item.path.split('/')[1]}` : item.path);
           
           return (
             <Link key={idx} to={item.path} className="flex flex-col items-center justify-center w-12 h-12 relative group">

@@ -61,7 +61,98 @@ router.put('/:id/vote', auth, async (req, res) => {
   }
 });
 
-// Get all posts
+// Get following feed
+router.get('/feed/following', auth, async (req, res) => {
+  try {
+    const User = require('../models/User');
+    const me = await User.findById(req.user.id).select('following');
+    const followingIds = me.following || [];
+
+    if (followingIds.length === 0) {
+      return res.json([]);
+    }
+
+    const posts = await Post.find({ author: { $in: followingIds } })
+      .populate('author', 'username avatar role')
+      .populate('comments.author', 'username avatar')
+      .sort({ createdAt: -1 })
+      .limit(50);
+      
+    res.json(posts);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Get for you feed (basic recommendation)
+router.get('/feed/foryou', auth, async (req, res) => {
+  try {
+    const User = require('../models/User');
+    const me = await User.findById(req.user.id);
+    
+    // In a real app, we'd use complex aggregations based on user interactions.
+    // Here we'll weight posts by matching tags/category or overall engagement.
+    
+    const posts = await Post.aggregate([
+      {
+        $addFields: {
+          engagementScore: {
+            $add: [
+              { $size: { $ifNull: ["$likes", []] } },
+              { $multiply: [{ $size: { $ifNull: ["$comments", []] } }, 2] },
+              { $multiply: [{ $ifNull: ["$shares", 0] }, 3] }
+            ]
+          }
+        }
+      },
+      { $sort: { engagementScore: -1, createdAt: -1 } },
+      { $limit: 50 }
+    ]);
+
+    await Post.populate(posts, { path: 'author', select: 'username avatar role' });
+    await Post.populate(posts, { path: 'comments.author', select: 'username avatar' });
+
+    res.json(posts);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Get trending feed
+router.get('/feed/trending', auth, async (req, res) => {
+  try {
+    // Trending = high engagement in the last 48 hours
+    const twoDaysAgo = new Date();
+    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+
+    const posts = await Post.aggregate([
+      { $match: { createdAt: { $gte: twoDaysAgo } } },
+      {
+        $addFields: {
+          engagementScore: {
+            $add: [
+              { $size: { $ifNull: ["$likes", []] } },
+              { $multiply: [{ $size: { $ifNull: ["$comments", []] } }, 2] },
+              { $multiply: [{ $ifNull: ["$shares", 0] }, 3] }
+            ]
+          }
+        }
+      },
+      { $sort: { engagementScore: -1 } },
+      { $limit: 30 }
+    ]);
+
+    await Post.populate(posts, { path: 'author', select: 'username avatar role' });
+    await Post.populate(posts, { path: 'comments.author', select: 'username avatar' });
+
+    res.json(posts);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Get all posts (General feed)
 router.get('/', auth, async (req, res) => {
   try {
     const posts = await Post.find()

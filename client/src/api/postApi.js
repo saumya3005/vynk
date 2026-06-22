@@ -5,6 +5,18 @@ export const postApi = {
     const res = await api.get('/posts');
     return res.data;
   },
+  getFeedFollowing: async () => {
+    const res = await api.get('/posts/feed/following');
+    return res.data;
+  },
+  getFeedForYou: async () => {
+    const res = await api.get('/posts/feed/foryou');
+    return res.data;
+  },
+  getFeedTrending: async () => {
+    const res = await api.get('/posts/feed/trending');
+    return res.data;
+  },
   getPost: async (id) => {
     const res = await api.get(`/posts/${id}`);
     return res.data;

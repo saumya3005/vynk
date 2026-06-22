@@ -35,6 +35,8 @@ const userSchema = new mongoose.Schema({
   resume: { type: String, default: '' },
   followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  followRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  pendingFollows: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   savedPosts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }],
   savedProjects: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Project' }],
   savedNotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Note' }],
@@ -46,7 +48,25 @@ const userSchema = new mongoose.Schema({
   resetPasswordExpire: { type: Date },
   twoFactorEnabled: { type: Boolean, default: false },
   twoFactorCode: { type: String },
-  twoFactorExpire: { type: Date }
+  twoFactorExpire: { type: Date },
+  settings: {
+    theme: { type: String, enum: ['light', 'dark', 'auto'], default: 'dark' },
+    accentColor: { type: String, default: '#FF5F45' },
+    reduceMotion: { type: Boolean, default: false },
+    notifications: {
+      likes: { type: Boolean, default: true },
+      comments: { type: Boolean, default: true },
+      follows: { type: Boolean, default: true },
+      messages: { type: Boolean, default: true },
+      email: { type: Boolean, default: true },
+      push: { type: Boolean, default: true }
+    },
+    privacy: {
+      isPrivate: { type: Boolean, default: false },
+      showActivityStatus: { type: Boolean, default: true },
+      allowMessagesFrom: { type: String, enum: ['everyone', 'followers', 'none'], default: 'everyone' }
+    }
+  }
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

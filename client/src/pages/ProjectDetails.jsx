@@ -20,10 +20,7 @@ const ProjectDetails = () => {
 
   const loadProject = async () => {
     try {
-      const data = await projectApi.getCommunityById ? await projectApi.getProjectById(id) : null; // wait, there's no getProjectById in projectApi? Let's assume we can add it or just use fetch
-      // Let's use fetch directly since we didn't add getProjectById to projectApi
-      const res = await fetch(`/api/projects/${id}`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }});
-      const dataRes = await res.json();
+      const dataRes = await projectApi.getProjectById(id);
       setProject(dataRes);
     } catch (err) {
       toast.error('Failed to load project details');

@@ -5,11 +5,15 @@ export const notificationApi = {
     const res = await axiosInstance.get('/notifications');
     return res.data;
   },
-  markAsRead: async (id) => {
+  getUnreadCount: async () => {
+    const res = await axiosInstance.get('/notifications/count');
+    return res.data.count;
+  },
+  markRead: async (id) => {
     const res = await axiosInstance.put(`/notifications/${id}/read`);
     return res.data;
   },
-  markAllAsRead: async () => {
+  markAllRead: async () => {
     const res = await axiosInstance.put('/notifications/read-all');
     return res.data;
   }

@@ -1,12 +1,135 @@
-import { useState, useEffect } from 'react';
-import { Bell, Heart, UserPlus, MessageCircle, Star, Hash } from 'lucide-react';
+import { useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Bell, Heart, UserPlus, MessageCircle, Star, Hash, CheckCircle, XCircle, Check } from 'lucide-react';
 import { notificationApi } from '../api/notificationApi';
+import { NotificationContext } from '../context/NotificationContext';
+import { userApi } from '../api/userApi';
 import toast from 'react-hot-toast';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { formatDistanceToNow } from 'date-fns';
+import { EmptyState } from '../components/ui/EmptyState';
+import { PostSkeleton } from '../components/ui/Skeleton';
+
+const TYPE_META = {
+  like:           { icon: Heart,          color: 'from-primary/20 to-primary/5',    iconColor: 'text-primary',   label: 'Liked your post' },
+  follow:         { icon: UserPlus,       color: 'from-green-500/20 to-green-500/5', iconColor: 'text-green-400', label: 'Started following you' },
+  follow_request: { icon: UserPlus,       color: 'from-secondary/20 to-secondary/5',iconColor: 'text-secondary', label: 'Requested to follow you' },
+  follow_accept:  { icon: CheckCircle,    color: 'from-green-500/20 to-green-500/5', iconColor: 'text-green-400', label: 'Accepted your follow request' },
+  comment:        { icon: MessageCircle,  color: 'from-accent/20 to-accent/5',       iconColor: 'text-accent',    label: 'Commented on your post' },
+  project:        { icon: Star,           color: 'from-yellow-500/20 to-yellow-500/5',iconColor: 'text-yellow-400',label: 'Interacted with your project' },
+  community:      { icon: Hash,           color: 'from-blue-500/20 to-blue-500/5',  iconColor: 'text-blue-400',  label: 'Community update' },
+};
+
+const FollowRequestActions = ({ notif, onAction }) => {
+  const [loading, setLoading] = useState(null);
+
+  const handle = async (action) => {
+    setLoading(action);
+    try {
+      // Extract requester ID from the notification link (/profile/:id)
+      const requesterId = notif.link?.split('/').pop();
+      if (!requesterId) throw new Error('No requester id');
+      if (action === 'accept') {
+        await userApi.acceptFollowRequest(requesterId);
+        toast.success('Follow request accepted');
+      } else {
+        await userApi.rejectFollowRequest(requesterId);
+        toast('Request declined', { icon: '🚫' });
+      }
+      onAction(notif._id);
+    } catch {
+      toast.error('Action failed');
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  return (
+    <div className="flex gap-2 mt-2 ml-auto shrink-0">
+      <button
+        onClick={() => handle('accept')}
+        disabled={!!loading}
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-linear-to-r from-primary to-secondary text-white text-xs font-bold disabled:opacity-50 hover:opacity-90 transition-opacity"
+      >
+        {loading === 'accept' ? <span className="animate-spin w-3 h-3 border-2 border-white border-t-transparent rounded-full inline-block" /> : <Check size={12} />}
+        Accept
+      </button>
+      <button
+        onClick={() => handle('reject')}
+        disabled={!!loading}
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border/60 text-muted text-xs font-bold disabled:opacity-50 hover:text-text hover:border-border transition-colors"
+      >
+        {loading === 'reject' ? <span className="animate-spin w-3 h-3 border-2 border-current border-t-transparent rounded-full inline-block" /> : <XCircle size={12} />}
+        Decline
+      </button>
+    </div>
+  );
+};
+
+const NotifCard = ({ notif, onMarkRead, onAction, navigate }) => {
+  const meta = TYPE_META[notif.type] || TYPE_META.like;
+  const IconComp = meta.icon;
+
+  const handleClick = () => {
+    if (!notif.isRead) onMarkRead(notif._id);
+    if (notif.link) navigate(notif.link);
+  };
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      onClick={handleClick}
+      className={`glass-card p-4 cursor-pointer transition-all border group relative overflow-hidden ${
+        notif.isRead 
+          ? 'border-border/20 opacity-70 hover:opacity-100 hover:border-border/40' 
+          : 'border-primary/20 shadow-md shadow-primary/5 hover:border-primary/40 bg-primary/5 hover:bg-primary/10'
+      }`}
+    >
+      {/* Subtle hover glow for unread */}
+      {!notif.isRead && (
+        <div className="absolute inset-0 bg-linear-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+      )}
+
+      <div className="flex gap-4 items-start relative z-10">
+        {/* Icon circle */}
+        <div className={`w-11 h-11 rounded-2xl bg-linear-to-br ${meta.color} flex items-center justify-center shrink-0 shadow-sm`}>
+          <IconComp size={20} className={meta.iconColor} />
+        </div>
+
+        {/* Text */}
+        <div className="flex-1 min-w-0">
+          <p className="text-sm text-text leading-snug font-medium group-hover:text-primary transition-colors duration-200">
+            {notif.message}
+          </p>
+          <p className="text-[11px] text-muted mt-1 font-medium">
+            {formatDistanceToNow(new Date(notif.createdAt), { addSuffix: true })}
+          </p>
+
+          {notif.type === 'follow_request' && !notif.isRead && (
+            <div onClick={e => e.stopPropagation()}>
+              <FollowRequestActions notif={notif} onAction={onAction} />
+            </div>
+          )}
+        </div>
+
+        {/* Unread dot */}
+        {!notif.isRead && (
+          <div className="w-2.5 h-2.5 rounded-full bg-primary shrink-0 mt-2 shadow-sm shadow-primary/50" />
+        )}
+      </div>
+    </motion.div>
+  );
+};
 
 const Notifications = () => {
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeFilter, setActiveFilter] = useState('all');
+  const { setUnreadCount } = useContext(NotificationContext);
 
   useEffect(() => {
     fetchNotifications();
@@ -17,7 +140,8 @@ const Notifications = () => {
     try {
       const data = await notificationApi.getNotifications();
       setNotifications(data);
-    } catch (err) {
+      setUnreadCount(data.filter(n => !n.isRead).length);
+    } catch {
       toast.error('Failed to load notifications');
     } finally {
       setIsLoading(false);
@@ -27,9 +151,10 @@ const Notifications = () => {
   const handleMarkAllRead = async () => {
     try {
       await notificationApi.markAllRead();
-      setNotifications(notifications.map(n => ({ ...n, isRead: true })));
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+      setUnreadCount(0);
       toast.success('All marked as read');
-    } catch (err) {
+    } catch {
       toast.error('Failed to mark read');
     }
   };
@@ -37,73 +162,99 @@ const Notifications = () => {
   const handleMarkRead = async (id) => {
     try {
       await notificationApi.markRead(id);
-      setNotifications(notifications.map(n => n._id === id ? { ...n, isRead: true } : n));
-    } catch (err) {
+      setNotifications(prev => prev.map(n => n._id === id ? { ...n, isRead: true } : n));
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch {
       toast.error('Failed to mark read');
     }
   };
 
-  const getIcon = (type) => {
-    switch(type) {
-      case 'like': return <Heart size={18} />;
-      case 'follow': return <UserPlus size={18} />;
-      case 'comment': return <MessageCircle size={18} />;
-      case 'project': return <Star size={18} />;
-      case 'community': return <Hash size={18} />;
-      default: return <Bell size={18} />;
-    }
+  // Called after accepting/rejecting a follow request — mark as read & remove actions
+  const handleFollowAction = (id) => {
+    handleMarkRead(id);
   };
 
-  const getColor = (type) => {
-    switch(type) {
-      case 'like': return 'text-primary bg-primary/20';
-      case 'follow': return 'text-green-600 bg-green-100';
-      case 'comment': return 'text-secondary bg-secondary/20';
-      case 'project': return 'text-yellow-600 bg-yellow-100';
-      case 'community': return 'text-blue-600 bg-blue-100';
-      default: return 'text-text bg-surface';
-    }
-  };
+  const FILTERS = ['all', 'unread', 'likes', 'follows', 'comments'];
+
+  const filtered = notifications.filter(n => {
+    if (activeFilter === 'all') return true;
+    if (activeFilter === 'unread') return !n.isRead;
+    if (activeFilter === 'likes') return n.type === 'like';
+    if (activeFilter === 'follows') return n.type === 'follow' || n.type === 'follow_request' || n.type === 'follow_accept';
+    if (activeFilter === 'comments') return n.type === 'comment';
+    return true;
+  });
+
+  const unread = notifications.filter(n => !n.isRead).length;
 
   return (
-    <div className="min-h-screen pt-24 px-4 max-w-3xl mx-auto pb-12">
+    <div className="min-h-screen pt-6 px-4 max-w-2xl mx-auto pb-24 md:pb-12">
+
+      {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold flex items-center gap-2 text-text"><Bell className="text-primary"/> Notifications</h1>
-        {notifications.some(n => !n.isRead) && (
-          <button onClick={handleMarkAllRead} className="text-sm font-bold text-primary hover:text-secondary transition-colors">Mark all as read</button>
+        <div>
+          <h1 className="text-2xl font-bold text-text flex items-center gap-2">
+            <Bell className="text-primary" size={26} />
+            Notifications
+            {unread > 0 && (
+              <span className="text-sm font-bold bg-primary/10 text-primary px-2.5 py-0.5 rounded-full">
+                {unread} new
+              </span>
+            )}
+          </h1>
+        </div>
+        {unread > 0 && (
+          <button
+            onClick={handleMarkAllRead}
+            className="text-sm font-bold text-primary hover:text-secondary transition-colors flex items-center gap-1"
+          >
+            <Check size={14} /> Mark all read
+          </button>
         )}
       </div>
 
+      {/* Filter Pills */}
+      <div className="flex gap-2 overflow-x-auto pb-3 mb-6 scrollbar-hide">
+        {FILTERS.map(f => (
+          <button
+            key={f}
+            onClick={() => setActiveFilter(f)}
+            className={`px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap capitalize transition-all ${
+              activeFilter === f
+                ? 'bg-linear-to-r from-primary to-secondary text-white shadow-md shadow-primary/20'
+                : 'bg-surface-soft text-muted border border-border/40 hover:text-text'
+            }`}
+          >
+            {f}
+          </button>
+        ))}
+      </div>
+
+      {/* List */}
       <div className="flex flex-col gap-3">
         {isLoading ? (
-          <div className="flex justify-center p-8">
-            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-          </div>
-        ) : notifications.length === 0 ? (
-          <div className="text-center py-12 text-muted">
-            <Bell size={48} className="mx-auto mb-4 opacity-50" />
-            <p className="font-bold">You're all caught up!</p>
-          </div>
+          <>
+            <PostSkeleton />
+            <PostSkeleton />
+            <PostSkeleton />
+          </>
+        ) : filtered.length === 0 ? (
+          <EmptyState
+            icon={Bell}
+            title="You're all caught up!"
+            message="No notifications in this category."
+          />
         ) : (
-          notifications.map(notif => (
-            <motion.div 
-              key={notif._id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              onClick={() => !notif.isRead && handleMarkRead(notif._id)}
-              className={`glass-card p-4 flex gap-4 items-center cursor-pointer transition-colors ${!notif.isRead ? 'bg-white/80 border-l-4 border-l-primary shadow-sm' : 'bg-white/40 opacity-70'}`}
-            >
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${getColor(notif.type)}`}>
-                {getIcon(notif.type)}
-              </div>
-              <p className="text-sm text-text flex-1">
-                {notif.message}
-              </p>
-              {!notif.isRead && (
-                <div className="w-2 h-2 rounded-full bg-primary shrink-0"></div>
-              )}
-            </motion.div>
-          ))
+          <AnimatePresence mode="popLayout">
+            {filtered.map(notif => (
+              <NotifCard
+                key={notif._id}
+                notif={notif}
+                onMarkRead={handleMarkRead}
+                onAction={handleFollowAction}
+              />
+            ))}
+          </AnimatePresence>
         )}
       </div>
     </div>
