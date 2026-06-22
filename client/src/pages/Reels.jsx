@@ -544,7 +544,7 @@ const Reels = () => {
   return (
     <div className="fixed inset-0 top-16 bg-black z-0 overflow-hidden">
       {/* Top Tabs */}
-      <div className="absolute top-0 left-0 right-0 z-30 pt-4 px-6 flex justify-between items-center bg-gradient-to-b from-black/80 to-transparent pointer-events-none">
+      <div className="absolute top-0 left-0 right-0 z-30 pt-4 px-6 flex justify-between items-center bg-linear-to-b from-black/80 to-transparent pointer-events-none">
         <div className="flex gap-6 pointer-events-auto">
           {['Following', 'Reels', 'Trending'].map(tab => (
             <button
