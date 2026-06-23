@@ -52,7 +52,7 @@ const Chat = () => {
 
   // Socket setup
   useEffect(() => {
-    const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5001';
+    const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://vynk-backend-1nod.onrender.com';
     const newSocket = io(SOCKET_URL);
     setSocket(newSocket);
 

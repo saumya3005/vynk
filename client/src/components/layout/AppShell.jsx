@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import RightSidebar from './RightSidebar';
 import MobileNav from './MobileNav';
@@ -6,6 +6,9 @@ import TopBar from './TopBar';
 import VynkAI from '../ui/VynkAI';
 
 const AppShell = () => {
+  const location = useLocation();
+  const isFullScreenApp = ['/reels', '/stories'].includes(location.pathname);
+
   return (
     <div className="w-full min-h-screen flex flex-col bg-bg">
       {/* Global top bar — always visible at top */}
@@ -18,7 +21,7 @@ const AppShell = () => {
 
         {/* Main content area */}
         <div className="flex-1 md:ml-64 lg:mr-80 min-h-[calc(100vh-4rem)] pb-20 md:pb-0 overflow-x-hidden">
-          <main className="w-full h-full max-w-4xl mx-auto px-4 md:px-6 py-6">
+          <main className={`w-full h-full max-w-4xl mx-auto ${isFullScreenApp ? '' : 'px-4 md:px-6 py-6'}`}>
             <Outlet />
           </main>
         </div>
@@ -35,3 +38,4 @@ const AppShell = () => {
 };
 
 export default AppShell;
+

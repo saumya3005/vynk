@@ -224,7 +224,40 @@ const ReelCard = ({ reel: initialReel, isActive, onPrev, onNext, totalReels, cur
           activeColor="text-yellow-400"
           fillActive={true}
         />
+        {reel.author?._id === user?.id && (
+          <ActionBtn
+            icon={MoreVertical}
+            onClick={(e) => { e.stopPropagation(); setShowMore(m => !m); }}
+          />
+        )}
       </div>
+
+      <AnimatePresence>
+        {showMore && reel.author?._id === user?.id && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            className="absolute bottom-20 right-16 bg-surface border border-border rounded-xl p-2 z-50 shadow-xl"
+            onClick={e => e.stopPropagation()}
+          >
+            <button
+              onClick={async () => {
+                try {
+                  await reelApi.deleteReel(reel._id);
+                  toast.success('Reel deleted');
+                  window.location.reload();
+                } catch {
+                  toast.error('Failed to delete');
+                }
+              }}
+              className="px-4 py-2 text-sm font-bold text-red-500 hover:bg-red-500/10 rounded-lg w-full text-left"
+            >
+              Delete Reel
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Bottom info */}
       <div
